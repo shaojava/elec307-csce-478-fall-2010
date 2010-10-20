@@ -1,3 +1,4 @@
+package HostDevice;
 
 public class MobileRobotCommands {
 
