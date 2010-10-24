@@ -2,30 +2,65 @@ package HostDevice;
 
 import gnu.io.CommPortIdentifier;
 import gnu.io.SerialPort;
-
 import java.io.InputStream;
 import java.io.OutputStream;
 
+/**
+ * The Class ComInterface.
+ */
 public class ComInterface {
+
+	/** The time to wait for a return. */
 	private int RECIEVE_WAIT_DELAY = 25;
+	
+	/** The time to wait between sending connection requests. */
 	private int CONNECT_REQUEST_WAIT_DELAY = 2000;
+	
+	/** The value of a confirmation byte */
 	private byte COMFIRM_COMMAND_BYTE = 1;
 
+	/** The serial port. */
 	private SerialPort serialPort;
+	
+	/** The input stream. */
 	private InputStream inputStream;
+	
+	/** The output stream. */
 	private OutputStream outputStream;
 
+	/**
+	 * Instantiates a new serial communication interface.
+	 *
+	 * @param portName the port name
+	 * @throws Exception the exception
+	 */
 	public ComInterface(String portName) throws Exception {
+		
+		//Get the communication port identifier
 		CommPortIdentifier portId = CommPortIdentifier.getPortIdentifier(portName);
+		
+		//Set up the serial port
 		serialPort = (SerialPort)portId.open("serial talk", 4000);
+		
+		//Set up the input stream
 		inputStream = serialPort.getInputStream();
+		
+		//Set up the output stream
 		outputStream = serialPort.getOutputStream();
+		
+		//Set the serial port parameters (these are defaults)
 		serialPort.setSerialPortParams(4800,
 				SerialPort.DATABITS_8,
 				SerialPort.STOPBITS_1,
 				SerialPort.PARITY_NONE);
 	}
 
+	/**
+	 * Establish connection.
+	 *
+	 * @return true, if successful
+	 * @throws Exception the exception
+	 */
 	public boolean establishConnection() throws Exception{
 
 		//Print getting connection request
@@ -56,7 +91,10 @@ public class ComInterface {
 						recievedData.append((char)recievedByte);
 					}
 				}
+				
+				//Trim the input data
 				recievedData.trimToSize();
+				
 				//Check if the received data was an ACK command from the device
 				if (recievedData.toString().equals("ACK")) {
 
@@ -72,6 +110,13 @@ public class ComInterface {
 		}
 	}
 
+	/**
+	 * Send command.
+	 *
+	 * @param commandByte the command byte
+	 * @return true, if successful
+	 * @throws Exception the exception
+	 */
 	public boolean sendCommand(byte commandByte) throws Exception{
 
 		//Send the byte command
@@ -95,14 +140,19 @@ public class ComInterface {
 				
 			}
 			else {
-				System.out.println("A confirmation byte was never recieved.");
 				return false;
 			}
 		}
-		System.out.println("There was some general error");
 		return false;
 	}
 	
+	/**
+	 * Send byte.
+	 *
+	 * @param dataByte the data byte
+	 * @return true, if successful
+	 * @throws Exception the exception
+	 */
 	public boolean sendByte(byte dataByte) throws Exception{
 
 		//Send the byte command
@@ -126,24 +176,31 @@ public class ComInterface {
 				
 			}
 			else {
-				System.out.println("A confirmation byte was never recieved.");
 				return false;
 			}
 		}
-		System.out.println("There was some general error");
 		return false;
 	}
 
-	public String recieveResult() throws Exception{
+	/**
+	 * Receive result.
+	 *
+	 * @return the string
+	 * @throws Exception the exception
+	 */
+	public String receiveResult() throws Exception{
 		//Wait for the data to be sent
 		Thread.sleep(RECIEVE_WAIT_DELAY);
 
 		//If there are bytes available to be read (some response from the device)
 		if (inputStream.available() > 0) {
 
+			//Initialize the string buffer and received char variable
 			StringBuffer receivedData = new StringBuffer();
 			byte receivedByte = 0;
 
+			//While there are bytes available in the buffer, read them until
+			//a return character in encountered (end of command)
 			while (inputStream.available() > 0) {
 				receivedByte = (byte) inputStream.read();
 				if (receivedByte != 1) {
@@ -151,19 +208,19 @@ public class ComInterface {
 				}
 			}
 
+			//If there was data received, send a confirmation to the device
 			if (receivedData.length() > 0) {
 				//Send a confirmation byte
 				outputStream.write(COMFIRM_COMMAND_BYTE);
 
+				//Return the result as a string
 				return receivedData.toString();
 			}
 			else {
-				System.out.println("There was a 0 lenth response.");
 				return null;
 			}
 		}
 		else {
-			System.out.println("There was no response data revieced.");
 			return null;
 		}
 	}
