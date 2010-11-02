@@ -1,6 +1,6 @@
 package HostDevice;
 
-import MobileRobotCommands.Commands;
+import RobotCommands.*;
 
 // TODO: Auto-generated Javadoc
 /**
@@ -17,7 +17,7 @@ public class MobileRobot {
 	public static void main(String[] args) throws Exception{
 		
 		//Establish IO port with machine communications port using the machine name for the port
-		ComInterface serialInterface = new ComInterface("/dev/tty.usbserial-A700eEl4");
+		CommInterface serialInterface = new CommInterface("/dev/tty.usbserial-A700eEl4");
 		
 		//If the connection was successful
 		if (serialInterface.establishConnection()) {
@@ -25,22 +25,6 @@ public class MobileRobot {
 			//Instantiate a MobileRobot commands object
 			Commands commandInterface = new Commands(serialInterface);
 			
-			//Wait
-			Thread.sleep(2000);
-			
-			//Drive Forward
-			commandInterface.motorDriveForward(255);
-			
-			//Wait
-			Thread.sleep(1000);
-			
-			//Stop the motor
-			commandInterface.motorStop();
-			
-			//Get the distance traveled
-			System.out.println(commandInterface.getHallCount());
-			System.out.println(commandInterface.getHallDistance());
-		
 			System.exit(0);
 		}
 	}

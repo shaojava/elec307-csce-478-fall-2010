@@ -1,43 +1,13 @@
 package RobotCommands;
 
-import HostDevice.ComInterface;
+import HostDevice.CommInterface;
 
-// TODO: Auto-generated Javadoc
-/**
- * The Class IRCommands.
- */
-public class IRCommands extends Commands{
+public class CompositeCommands extends BaseCommands {
 
-	/**
-	 * Instantiates a new iR commands.
-	 *
-	 * @param serial the serial
-	 */
-	public IRCommands(ComInterface serial) {
+	public CompositeCommands(CommInterface serial) {
 		super(serial);
 	}
 	
-
-	/**
-	 * Gets the iR front.
-	 *
-	 * @return the iR front
-	 * @throws Exception the exception
-	 */
-	public int getIRFront() throws Exception {
-		
-		//Send the command byte
-		if (serialInterface.sendCommand((byte) 8)) {
-			
-			//If the command byte was received, return the value
-			return Integer.parseInt(serialInterface.receiveResult().trim());
-		}
-		else {
-			return -1;
-		}
-	}
-	
-
 	/**
 	 * Gets the iR front distance.
 	 *
@@ -46,12 +16,10 @@ public class IRCommands extends Commands{
 	 */
 	public double getIRFrontDistance() throws Exception {
 		
+		double analogValue = super.getIRFront();
+		
 		//Send the command byte
-		if (serialInterface.sendCommand((byte) 8)) {
-			
-			//Read the analog value
-			double analogValue = Double.parseDouble(serialInterface.receiveResult().trim());
-			System.out.println(analogValue);
+		if (analogValue > -1) {
 			
 			//Calculate the Distance from the object in inches
 			//Regression equation:
@@ -78,24 +46,7 @@ public class IRCommands extends Commands{
 		}
 	}
 	
-	/**
-	 * Gets the iR left.
-	 *
-	 * @return the iR left
-	 * @throws Exception the exception
-	 */
-	public int getIRLeft() throws Exception {
-		
-		//Send the command byte
-		if (serialInterface.sendCommand((byte) 9)) {
-			
-			//If the command byte was received, return the value
-			return Integer.parseInt(serialInterface.receiveResult().trim());
-		}
-		else {
-			return -1;
-		}
-	}
+
 	
 	/**
 	 * Gets the iR left distance.
@@ -105,12 +56,10 @@ public class IRCommands extends Commands{
 	 */
 	public double getIRLeftDistance() throws Exception {
 		
+		double analogValue = super.getIRLeft();
+		
 		//Send the command byte
-		if (serialInterface.sendCommand((byte) 9)) {
-			
-			//Read the analog value
-			double analogValue = Double.parseDouble(serialInterface.receiveResult().trim());
-			System.out.println(analogValue);
+		if (analogValue > -1) {
 			
 			//Calculate the Distance from the object in inches
 			//Regression equation:
@@ -138,43 +87,7 @@ public class IRCommands extends Commands{
 		}
 	}
 	
-	/**
-	 * Gets the iR right.
-	 *
-	 * @return the iR right
-	 * @throws Exception the exception
-	 */
-	public int getIRRight() throws Exception {
-		
-		//Send the command byte
-		if (serialInterface.sendCommand((byte) 10)) {
-			
-			//If the command byte was received, return the value
-			return Integer.parseInt(serialInterface.receiveResult().trim());
-		}
-		else {
-			return -1;
-		}
-	}
-	
-	/**
-	 * Gets the iR back.
-	 *
-	 * @return the iR back
-	 * @throws Exception the exception
-	 */
-	public int getIRBack() throws Exception {
-		
-		//Send the command byte
-		if (serialInterface.sendCommand((byte) 11)) {
-			
-			//If the command byte was received, return the value
-			return Integer.parseInt(serialInterface.receiveResult().trim());
-		}
-		else {
-			return -1;
-		}
-	}
+
 	
 	/**
 	 * Gets the iR back distance.
@@ -184,12 +97,10 @@ public class IRCommands extends Commands{
 	 */
 	public double getIRBackDistance() throws Exception {
 		
+		double analogValue = super.getIRBack();
+		
 		//Send the command byte
-		if (serialInterface.sendCommand((byte) 11)) {
-			
-			//Read the analog value
-			double analogValue = Double.parseDouble(serialInterface.receiveResult().trim());
-			System.out.println(analogValue);
+		if (analogValue > -1) {
 			
 			//Calculate the Distance from the object in inches
 			//Regression equation:
@@ -218,25 +129,18 @@ public class IRCommands extends Commands{
 	}
 	
 	/**
-	 * Gets the iR bottom.
+	 * Gets the hall distance.
 	 *
-	 * @return the iR bottom
+	 * @return the hall distance
 	 * @throws Exception the exception
 	 */
-	public int getIRBottom() throws Exception {
-		
-		//Send the command byte
-		if (serialInterface.sendCommand((byte) 12)) {
-			
-			//If the command byte was received, send the power level
-			//If the power level was received, return true
-			return Integer.parseInt(serialInterface.receiveResult().trim());
-		}
-		else {
-			return -1;
-		}
-	}
-	
+	public double getHallDistance() throws Exception {
 
+		//If the command byte was received, return the value
+		double hallCount = get
+		double hallDistance = (Math.PI * hallCount) / 6;
+
+		return hallDistance;
+	}
 
 }
