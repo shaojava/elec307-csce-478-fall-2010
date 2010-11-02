@@ -2,13 +2,28 @@ package RobotCommands;
 
 import HostDevice.ComInterface;
 
+// TODO: Auto-generated Javadoc
+/**
+ * The Class IRCommands.
+ */
 public class IRCommands extends Commands{
 
+	/**
+	 * Instantiates a new iR commands.
+	 *
+	 * @param serial the serial
+	 */
 	public IRCommands(ComInterface serial) {
 		super(serial);
 	}
 	
 
+	/**
+	 * Gets the iR front.
+	 *
+	 * @return the iR front
+	 * @throws Exception the exception
+	 */
 	public int getIRFront() throws Exception {
 		
 		//Send the command byte
@@ -23,6 +38,12 @@ public class IRCommands extends Commands{
 	}
 	
 
+	/**
+	 * Gets the iR front distance.
+	 *
+	 * @return the iR front distance
+	 * @throws Exception the exception
+	 */
 	public double getIRFrontDistance() throws Exception {
 		
 		//Send the command byte
@@ -57,6 +78,12 @@ public class IRCommands extends Commands{
 		}
 	}
 	
+	/**
+	 * Gets the iR left.
+	 *
+	 * @return the iR left
+	 * @throws Exception the exception
+	 */
 	public int getIRLeft() throws Exception {
 		
 		//Send the command byte
@@ -70,6 +97,12 @@ public class IRCommands extends Commands{
 		}
 	}
 	
+	/**
+	 * Gets the iR left distance.
+	 *
+	 * @return the iR left distance
+	 * @throws Exception the exception
+	 */
 	public double getIRLeftDistance() throws Exception {
 		
 		//Send the command byte
@@ -105,6 +138,12 @@ public class IRCommands extends Commands{
 		}
 	}
 	
+	/**
+	 * Gets the iR right.
+	 *
+	 * @return the iR right
+	 * @throws Exception the exception
+	 */
 	public int getIRRight() throws Exception {
 		
 		//Send the command byte
@@ -118,6 +157,12 @@ public class IRCommands extends Commands{
 		}
 	}
 	
+	/**
+	 * Gets the iR back.
+	 *
+	 * @return the iR back
+	 * @throws Exception the exception
+	 */
 	public int getIRBack() throws Exception {
 		
 		//Send the command byte
@@ -131,6 +176,12 @@ public class IRCommands extends Commands{
 		}
 	}
 	
+	/**
+	 * Gets the iR back distance.
+	 *
+	 * @return the iR back distance
+	 * @throws Exception the exception
+	 */
 	public double getIRBackDistance() throws Exception {
 		
 		//Send the command byte
@@ -166,6 +217,12 @@ public class IRCommands extends Commands{
 		}
 	}
 	
+	/**
+	 * Gets the iR bottom.
+	 *
+	 * @return the iR bottom
+	 * @throws Exception the exception
+	 */
 	public int getIRBottom() throws Exception {
 		
 		//Send the command byte

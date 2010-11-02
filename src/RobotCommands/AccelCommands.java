@@ -2,12 +2,27 @@ package RobotCommands;
 
 import HostDevice.ComInterface;
 
+// TODO: Auto-generated Javadoc
+/**
+ * The Class AccelCommands.
+ */
 public class AccelCommands extends Commands{
 
+	/**
+	 * Instantiates a new accel commands.
+	 *
+	 * @param serial the serial
+	 */
 	public AccelCommands(ComInterface serial) {
 		super(serial);
 	}
 
+	/**
+	 * Gets the accelerometer x.
+	 *
+	 * @return the accelerometer x
+	 * @throws Exception the exception
+	 */
 	public int getAccelerometerX() throws Exception {
 		
 		//Send the command byte
@@ -21,6 +36,12 @@ public class AccelCommands extends Commands{
 		}
 	}
 	
+	/**
+	 * Gets the accelerometer y.
+	 *
+	 * @return the accelerometer y
+	 * @throws Exception the exception
+	 */
 	public int getAccelerometerY() throws Exception {
 		
 		//Send the command byte
@@ -34,6 +55,12 @@ public class AccelCommands extends Commands{
 		}
 	}
 	
+	/**
+	 * Gets the accelerometer z.
+	 *
+	 * @return the accelerometer z
+	 * @throws Exception the exception
+	 */
 	public int getAccelerometerZ() throws Exception {
 		
 		//Send the command byte
@@ -47,6 +74,13 @@ public class AccelCommands extends Commands{
 		}
 	}
 	
+	/**
+	 * Sets the accelerometer sensitivity.
+	 *
+	 * @param sensitivity the sensitivity
+	 * @return true, if successful
+	 * @throws Exception the exception
+	 */
 	public boolean setAccelerometerSensitivity(int sensitivity) throws Exception {
 		
 		//If the sensitivity value is not in the correct range, return false
@@ -66,6 +100,12 @@ public class AccelCommands extends Commands{
 		}
 	}
 	
+	/**
+	 * Sets the accelerometer sleep.
+	 *
+	 * @return true, if successful
+	 * @throws Exception the exception
+	 */
 	public boolean setAccelerometerSleep() throws Exception {
 		
 		//Send the command byte
@@ -79,6 +119,12 @@ public class AccelCommands extends Commands{
 		}
 	}
 	
+	/**
+	 * Sets the accelerometer wake.
+	 *
+	 * @return true, if successful
+	 * @throws Exception the exception
+	 */
 	public boolean setAccelerometerWake() throws Exception {
 		
 		//Send the command byte

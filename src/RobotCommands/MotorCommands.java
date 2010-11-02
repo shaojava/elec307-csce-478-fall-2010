@@ -2,12 +2,28 @@ package RobotCommands;
 
 import HostDevice.ComInterface;
 
+// TODO: Auto-generated Javadoc
+/**
+ * The Class MotorCommands.
+ */
 public class MotorCommands extends Commands {
 
+	/**
+	 * Instantiates a new motor commands.
+	 *
+	 * @param serial the serial
+	 */
 	public MotorCommands(ComInterface serial) {
 		super(serial);
 	}
 
+	/**
+	 * Motor drive forward.
+	 *
+	 * @param power the power
+	 * @return true, if successful
+	 * @throws Exception the exception
+	 */
 	public boolean motorDriveForward(int power) throws Exception {
 		
 		//If the supplied power is not within the accepted range, return false
@@ -25,6 +41,13 @@ public class MotorCommands extends Commands {
 		}
 	}
 	
+	/**
+	 * Motor drive reverse.
+	 *
+	 * @param power the power
+	 * @return true, if successful
+	 * @throws Exception the exception
+	 */
 	public boolean motorDriveReverse(int power) throws Exception {
 		
 		//If the supplied power is not within the accepted range, return false
@@ -42,6 +65,13 @@ public class MotorCommands extends Commands {
 		}
 	}
 	
+	/**
+	 * Motor turn left.
+	 *
+	 * @param power the power
+	 * @return true, if successful
+	 * @throws Exception the exception
+	 */
 	public boolean motorTurnLeft(int power) throws Exception {
 		
 		//If the supplied power is not within the accepted range, return false
@@ -59,6 +89,13 @@ public class MotorCommands extends Commands {
 		}
 	}
 	
+	/**
+	 * Motor turn right.
+	 *
+	 * @param power the power
+	 * @return true, if successful
+	 * @throws Exception the exception
+	 */
 	public boolean motorTurnRight(int power) throws Exception {
 		
 		//If the supplied power is not within the accepted range, return false
@@ -78,6 +115,12 @@ public class MotorCommands extends Commands {
 		}
 	}
 	
+	/**
+	 * Motor stop.
+	 *
+	 * @return true, if successful
+	 * @throws Exception the exception
+	 */
 	public boolean motorStop() throws Exception {
 		
 		//If the command byte was received, send the power level
@@ -90,6 +133,12 @@ public class MotorCommands extends Commands {
 		}
 	}
 	
+	/**
+	 * Motor center.
+	 *
+	 * @return true, if successful
+	 * @throws Exception the exception
+	 */
 	public boolean motorCenter() throws Exception {
 		
 		//If the command byte was received, send the power level

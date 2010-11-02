@@ -5,11 +5,17 @@ import gnu.io.SerialPort;
 import java.io.InputStream;
 import java.io.OutputStream;
 
+import org.apache.log4j.Logger;
+
+import RobotCommands.Commands;
+
 // TODO: Auto-generated Javadoc
 /**
  * The Class ComInterface.
  */
-public class ComInterface {
+public class CommInterface {
+	
+	private int BAUD_RATE = 115200;
 
 	/** The time to wait for a return. */
 	private int RECIEVE_WAIT_DELAY = 50;
@@ -28,6 +34,8 @@ public class ComInterface {
 	
 	/** The output stream. */
 	private OutputStream outputStream;
+	
+	private Logger log;
 
 	/**
 	 * Instantiates a new serial communication interface.
@@ -35,12 +43,17 @@ public class ComInterface {
 	 * @param portName the port name
 	 * @throws Exception the exception
 	 */
-	public ComInterface(String portName) throws Exception {
+	public CommInterface(String portName) throws Exception {
+		
+		//
+		log = Logger.getLogger(CommInterface.class);
 		
 		//Get the communication port identifier
+		log.info("Getting port identifier for: " + portName);
 		CommPortIdentifier portId = CommPortIdentifier.getPortIdentifier(portName);
 		
 		//Set up the serial port
+		log.info("Opening port");
 		serialPort = (SerialPort)portId.open("serial talk", 4000);
 		
 		//Set up the input stream
@@ -50,7 +63,9 @@ public class ComInterface {
 		outputStream = serialPort.getOutputStream();
 		
 		//Set the serial port parameters (these are defaults)
-		serialPort.setSerialPortParams(9600,
+		log.info("Setting port parameters");
+		log.info("Baud Rate: " + BAUD_RATE);
+		serialPort.setSerialPortParams(BAUD_RATE,
 				SerialPort.DATABITS_8,
 				SerialPort.STOPBITS_1,
 				SerialPort.PARITY_NONE);
@@ -72,10 +87,13 @@ public class ComInterface {
 
 			//Send a SYN command
 			byte[] synCommand = new String("SYN").getBytes("ASCII");
+			log.info("Writing SYN command to comm port: " + synCommand);
 			outputStream.write(synCommand);
 
 			//If there are bytes available to be read (some response from the device)
 			if (inputStream.available() > 0) {
+				
+				log.info("Data recieved on input stream.");
 
 				//Initialize the string buffer and received char variable
 				StringBuffer recievedData = new StringBuffer();
@@ -95,10 +113,13 @@ public class ComInterface {
 				
 				//Trim the input data
 				recievedData.trimToSize();
+				log.info("recieved: " + recievedData);
 				
 				//Check if the received data was an ACK command from the device
 				if (recievedData.toString().equals("ACK")) {
 
+					log.debug("ACK command recieved.  Connection Established.");
+					
 					//Print that the connection was established and return true
 					System.out.println("\nConnection Established");
 					return true;
@@ -120,6 +141,8 @@ public class ComInterface {
 	 */
 	public boolean sendCommand(byte commandByte) throws Exception{
 
+		log.debug("Sending command byte: " + commandByte);
+		
 		//Send the byte command
 		outputStream.write(commandByte);
 
@@ -136,15 +159,24 @@ public class ComInterface {
 			//If the byte received was a confirmation
 			if ( recievedByte[0] == COMFIRM_COMMAND_BYTE ) {
 				
+				log.debug("Command " + commandByte + " acknowledged.");
+				
 				//Receive the result from the device
 				return true;
 				
 			}
 			else {
+				log.error("Byte not recieved for " + commandByte + " command was not a confirmation byte");
+				log.error("Command byte recieved: " + recievedByte[0]);
 				return false;
 			}
 		}
-		return false;
+		
+		else {
+			log.error("There was not data recieved for " + commandByte + " command.");
+			return false;
+		}
+		
 	}
 	
 	/**
@@ -156,6 +188,8 @@ public class ComInterface {
 	 */
 	public boolean sendByte(byte dataByte) throws Exception{
 
+		log.debug("Sending data byte: " + dataByte);
+		
 		//Send the byte command
 		outputStream.write(dataByte);
 
@@ -177,9 +211,12 @@ public class ComInterface {
 				
 			}
 			else {
+				log.error("Byte not recieved for " + dataByte + " data was not a confirmation byte");
+				log.error("Command byte recieved: " + recievedByte[0]);
 				return false;
 			}
 		}
+		log.error("There was no confirmation data recieved for " + dataByte + " data.");
 		return false;
 	}
 
@@ -190,11 +227,16 @@ public class ComInterface {
 	 * @throws Exception the exception
 	 */
 	public String receiveResult() throws Exception{
+		
+		log.info("Expecting data from the remote device");
+		
 		//Wait for the data to be sent
 		Thread.sleep(RECIEVE_WAIT_DELAY);
 
 		//If there are bytes available to be read (some response from the device)
 		if (inputStream.available() > 0) {
+			
+			log.info("Recived data from the remote device");
 
 			//Initialize the string buffer and received char variable
 			StringBuffer receivedData = new StringBuffer();
@@ -211,7 +253,11 @@ public class ComInterface {
 
 			//If there was data received, send a confirmation to the device
 			if (receivedData.length() > 0) {
+				
+				log.info("Recived data string: " + receivedData.toString());
+				
 				//Send a confirmation byte
+				log.info("Sending command confirmation byte");
 				outputStream.write(COMFIRM_COMMAND_BYTE);
 
 				//Return the result as a string
