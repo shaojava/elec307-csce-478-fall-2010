@@ -5,18 +5,19 @@ import gnu.io.SerialPort;
 import java.io.InputStream;
 import java.io.OutputStream;
 
+// TODO: Auto-generated Javadoc
 /**
  * The Class ComInterface.
  */
 public class ComInterface {
 
 	/** The time to wait for a return. */
-	private int RECIEVE_WAIT_DELAY = 25;
+	private int RECIEVE_WAIT_DELAY = 50;
 	
 	/** The time to wait between sending connection requests. */
 	private int CONNECT_REQUEST_WAIT_DELAY = 2000;
 	
-	/** The value of a confirmation byte */
+	/** The value of a confirmation byte. */
 	private byte COMFIRM_COMMAND_BYTE = 1;
 
 	/** The serial port. */
@@ -49,7 +50,7 @@ public class ComInterface {
 		outputStream = serialPort.getOutputStream();
 		
 		//Set the serial port parameters (these are defaults)
-		serialPort.setSerialPortParams(4800,
+		serialPort.setSerialPortParams(9600,
 				SerialPort.DATABITS_8,
 				SerialPort.STOPBITS_1,
 				SerialPort.PARITY_NONE);
