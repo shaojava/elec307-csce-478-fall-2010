@@ -137,7 +137,7 @@ public class CompositeCommands extends BaseCommands {
 	public double getHallDistance() throws Exception {
 
 		//If the command byte was received, return the value
-		double hallCount = get
+		double hallCount = 0;
 		double hallDistance = (Math.PI * hallCount) / 6;
 
 		return hallDistance;
