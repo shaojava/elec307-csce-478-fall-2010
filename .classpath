@@ -11,6 +11,5 @@
 	<classpathentry kind="lib" path="lib/RXTXcomm.jar"/>
 	<classpathentry kind="lib" path="lib/OSX/librxtxSerial.jnilib"/>
 	<classpathentry kind="lib" path="lib/log4j.jar"/>
-	<classpathentry kind="lib" path="lib/xbee-api-0.5.5.jar"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>

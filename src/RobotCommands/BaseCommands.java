@@ -1,5 +1,9 @@
 package RobotCommands;
 
+import java.io.ByteArrayOutputStream;
+import java.io.DataOutputStream;
+import java.io.IOException;
+
 import org.apache.log4j.Logger;
 import HostDevice.CommInterface;
 
@@ -33,10 +37,10 @@ public class BaseCommands {
 	public int getAccelerometerX() throws Exception {
 		
 		//Send the command byte
-		if (serialInterface.sendCommand((byte) 2)) {
+		if (serialInterface.sendCommand(2)) {
 			
 			//If the command byte was received, return the value
-			return Integer.parseInt(serialInterface.receiveResult().trim());
+			return Integer.parseInt(serialInterface.receiveInteger().trim());
 		}
 		else {
 			return -1;
@@ -52,10 +56,10 @@ public class BaseCommands {
 	public int getAccelerometerY() throws Exception {
 		
 		//Send the command byte
-		if (serialInterface.sendCommand((byte) 3)) {
+		if (serialInterface.sendCommand(3)) {
 			
 			//If the command byte was received, return the value
-			return Integer.parseInt(serialInterface.receiveResult().trim());
+			return Integer.parseInt(serialInterface.receiveInteger().trim());
 		}
 		else {
 			return -1;
@@ -71,10 +75,10 @@ public class BaseCommands {
 	public int getAccelerometerZ() throws Exception {
 		
 		//Send the command byte
-		if (serialInterface.sendCommand((byte) 4)) {
+		if (serialInterface.sendCommand(4)) {
 			
 			//If the command byte was received, return the value
-			return Integer.parseInt(serialInterface.receiveResult().trim());
+			return Integer.parseInt(serialInterface.receiveInteger().trim());
 		}
 		else {
 			return -1;
@@ -96,11 +100,11 @@ public class BaseCommands {
 		}
 		
 		//Send the command byte
-		if (serialInterface.sendCommand((byte) 5)) {
+		if (serialInterface.sendCommand(5)) {
 			
 			//If the command byte was received, send the sensitivity value
 			//Return true if the command was executed successfully
-			return serialInterface.sendByte((byte) sensitivity);
+			return serialInterface.sendInteger(sensitivity);
 		}
 		else {
 			return false;
@@ -116,7 +120,7 @@ public class BaseCommands {
 	public boolean setAccelerometerSleep() throws Exception {
 		
 		//Send the command byte
-		if (serialInterface.sendCommand((byte) 6)) {
+		if (serialInterface.sendCommand(6)) {
 			
 			//If the command byte was received, return true
 			return true;
@@ -135,7 +139,7 @@ public class BaseCommands {
 	public boolean setAccelerometerWake() throws Exception {
 		
 		//Send the command byte
-		if (serialInterface.sendCommand((byte) 7)) {
+		if (serialInterface.sendCommand(7)) {
 			
 			//If the command byte was received, return true
 			return true;
@@ -154,10 +158,10 @@ public class BaseCommands {
 	public int getIRFront() throws Exception {
 		
 		//Send the command byte
-		if (serialInterface.sendCommand((byte) 8)) {
+		if (serialInterface.sendCommand(8)) {
 			
 			//If the command byte was received, return the value
-			return Integer.parseInt(serialInterface.receiveResult().trim());
+			return Integer.parseInt(serialInterface.receiveInteger().trim());
 		}
 		else {
 			return -1;
@@ -173,10 +177,10 @@ public class BaseCommands {
 	public int getIRLeft() throws Exception {
 		
 		//Send the command byte
-		if (serialInterface.sendCommand((byte) 9)) {
+		if (serialInterface.sendCommand(9)) {
 			
 			//If the command byte was received, return the value
-			return Integer.parseInt(serialInterface.receiveResult().trim());
+			return Integer.parseInt(serialInterface.receiveInteger().trim());
 		}
 		else {
 			return -1;
@@ -192,10 +196,10 @@ public class BaseCommands {
 	public int getIRRight() throws Exception {
 		
 		//Send the command byte
-		if (serialInterface.sendCommand((byte) 10)) {
+		if (serialInterface.sendCommand(10)) {
 			
 			//If the command byte was received, return the value
-			return Integer.parseInt(serialInterface.receiveResult().trim());
+			return Integer.parseInt(serialInterface.receiveInteger().trim());
 		}
 		else {
 			return -1;
@@ -214,7 +218,7 @@ public class BaseCommands {
 		if (serialInterface.sendCommand((byte) 11)) {
 			
 			//If the command byte was received, return the value
-			return Integer.parseInt(serialInterface.receiveResult().trim());
+			return Integer.parseInt(serialInterface.receiveInteger().trim());
 		}
 		else {
 			return -1;
@@ -230,11 +234,11 @@ public class BaseCommands {
 	public int getIRBottom() throws Exception {
 		
 		//Send the command byte
-		if (serialInterface.sendCommand((byte) 12)) {
+		if (serialInterface.sendCommand(12)) {
 			
 			//If the command byte was received, send the power level
 			//If the power level was received, return true
-			return Integer.parseInt(serialInterface.receiveResult().trim());
+			return Integer.parseInt(serialInterface.receiveInteger().trim());
 		}
 		else {
 			return -1;
@@ -257,8 +261,8 @@ public class BaseCommands {
 		
 		//If the command byte was received, send the power level
 		//If the power level was received, return true
-		if (serialInterface.sendCommand((byte) 13)) {
-			return serialInterface.sendByte(new Integer(power).byteValue());
+		if (serialInterface.sendCommand(13)) {
+			return serialInterface.sendInteger(power);
 		}
 		else {
 			return false;
@@ -281,8 +285,8 @@ public class BaseCommands {
 		
 		//If the command byte was received, send the power level
 		//If the power level was received, return true
-		if (serialInterface.sendCommand((byte) 14)) {
-			return serialInterface.sendByte((byte) power);
+		if (serialInterface.sendCommand(14)) {
+			return serialInterface.sendInteger(power);
 		}
 		else {
 			return false;
@@ -305,8 +309,8 @@ public class BaseCommands {
 		
 		//If the command byte was received, send the power level
 		//If the power level was received, return true
-		if (serialInterface.sendCommand((byte) 15)) {
-			return serialInterface.sendByte((byte) power);
+		if (serialInterface.sendCommand(15)) {
+			return serialInterface.sendInteger(power);
 		}
 		else {
 			return false;
@@ -328,11 +332,11 @@ public class BaseCommands {
 		}
 		
 		//Send the command byte
-		if (serialInterface.sendCommand((byte) 16)) {
+		if (serialInterface.sendCommand(16)) {
 			
 			//If the command byte was received, send the power level
 			//If the power level was received, return true
-			return serialInterface.sendByte((byte) power);
+			return serialInterface.sendInteger(power);
 		}
 		else {
 			return false;
@@ -349,7 +353,7 @@ public class BaseCommands {
 		
 		//If the command byte was received, send the power level
 		//If the power level was received, return true
-		if (serialInterface.sendCommand((byte) 17)) {
+		if (serialInterface.sendCommand(17)) {
 			return true;
 		}
 		else {
@@ -367,7 +371,7 @@ public class BaseCommands {
 		
 		//If the command byte was received, send the power level
 		//If the power level was received, return true
-		if (serialInterface.sendCommand((byte) 18)) {
+		if (serialInterface.sendCommand(18)) {
 			return true;
 		}
 		else {
@@ -384,7 +388,7 @@ public class BaseCommands {
 	public boolean sleepRobot() throws Exception {
 		
 		//Send the command byte
-		if (serialInterface.sendCommand((byte) 255)) {
+		if (serialInterface.sendCommand(255)) {
 			
 			return true;
 			
@@ -403,10 +407,10 @@ public class BaseCommands {
 	public int getHallCount() throws Exception {
 
 		//Send the command byte
-		if (serialInterface.sendCommand((byte) 19)) {
+		if (serialInterface.sendCommand(19)) {
 
 			//If the command byte was received, return the value
-			return Integer.parseInt(serialInterface.receiveResult().trim());
+			return Integer.parseInt(serialInterface.receiveInteger().trim());
 		}
 		else {
 			return -1;

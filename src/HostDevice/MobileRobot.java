@@ -1,6 +1,7 @@
 package HostDevice;
 
 import RobotCommands.BaseCommands;
+import RobotCommands.CompositeCommands;
 
 // TODO: Auto-generated Javadoc
 /**
@@ -23,15 +24,14 @@ public class MobileRobot {
 		if (serialInterface.establishConnection()) {
 			
 			//Instantiate a MobileRobot commands object
-			BaseCommands baseCommands = new BaseCommands(serialInterface);
+			CompositeCommands commands = new CompositeCommands(serialInterface);
 			
-			baseCommands.motorDriveForward(255);
+			while(true) {
+				System.out.println(commands.getIRFront());
+				Thread.sleep(1000);
+			}
 			
-			Thread.sleep(5000);
-			
-			baseCommands.motorStop();
-			
-			System.exit(0);
+			//System.exit(0);
 		}
 	}
 }

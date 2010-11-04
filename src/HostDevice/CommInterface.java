@@ -2,39 +2,43 @@ package HostDevice;
 
 import gnu.io.CommPortIdentifier;
 import gnu.io.SerialPort;
+
+import java.io.ByteArrayOutputStream;
+import java.io.DataOutputStream;
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.nio.ByteBuffer;
 
 import org.apache.log4j.Logger;
-
-import RobotCommands.Commands;
 
 // TODO: Auto-generated Javadoc
 /**
  * The Class ComInterface.
  */
 public class CommInterface {
-	
+
 	private int BAUD_RATE = 115200;
 
 	/** The time to wait for a return. */
-	private int RECIEVE_WAIT_DELAY = 50;
-	
+	private int RECIEVE_WAIT_DELAY = 30;
+
 	/** The time to wait between sending connection requests. */
 	private int CONNECT_REQUEST_WAIT_DELAY = 2000;
-	
+
 	/** The value of a confirmation byte. */
-	private byte COMFIRM_COMMAND_BYTE = 1;
+	private byte ASCII_COMFIRM_BYTE = 0x06;
+
+	private byte ASCII_NEW_LINE = 0x0a;
 
 	/** The serial port. */
 	private SerialPort serialPort;
-	
+
 	/** The input stream. */
 	private InputStream inputStream;
-	
+
 	/** The output stream. */
 	private OutputStream outputStream;
-	
+
 	private Logger log;
 
 	/**
@@ -44,24 +48,24 @@ public class CommInterface {
 	 * @throws Exception the exception
 	 */
 	public CommInterface(String portName) throws Exception {
-		
+
 		//
 		log = Logger.getLogger(CommInterface.class);
-		
+
 		//Get the communication port identifier
 		log.info("Getting port identifier for: " + portName);
 		CommPortIdentifier portId = CommPortIdentifier.getPortIdentifier(portName);
-		
+
 		//Set up the serial port
 		log.info("Opening port");
 		serialPort = (SerialPort)portId.open("serial talk", 4000);
-		
+
 		//Set up the input stream
 		inputStream = serialPort.getInputStream();
-		
+
 		//Set up the output stream
 		outputStream = serialPort.getOutputStream();
-		
+
 		//Set the serial port parameters (these are defaults)
 		log.info("Setting port parameters");
 		log.info("Baud Rate: " + BAUD_RATE);
@@ -84,51 +88,46 @@ public class CommInterface {
 
 		//Keep trying to contact the device indefinitely
 		while(true){
+			
+			//Print a dot and sleep until another connection request is sent
+			System.out.print(".");
+			Thread.sleep(CONNECT_REQUEST_WAIT_DELAY);
 
 			//Send a SYN command
-			byte[] synCommand = new String("SYN").getBytes("ASCII");
+			byte[] synCommand = new String("SYN\r\n").getBytes("ASCII");
 			log.info("Writing SYN command to comm port: " + synCommand);
 			outputStream.write(synCommand);
 
 			//If there are bytes available to be read (some response from the device)
 			if (inputStream.available() > 0) {
-				
+
 				log.info("Data recieved on input stream.");
 
 				//Initialize the string buffer and received char variable
 				StringBuffer recievedData = new StringBuffer();
 				byte recievedByte = 0;
 
-				//Wait for all the data to come in
-				Thread.sleep(RECIEVE_WAIT_DELAY);
-
 				//While there are bytes available in the buffer, read them until
 				//a return character in encountered (end of command)
-				while (inputStream.available() > 0) {
+				do {
 					recievedByte = (byte) inputStream.read();
-					if (recievedByte != 1) {
-						recievedData.append((char)recievedByte);
-					}
-				}
-				
-				//Trim the input data
-				recievedData.trimToSize();
-				log.info("recieved: " + recievedData);
-				
+					recievedData.append((char)recievedByte);
+				} while (recievedByte != ASCII_NEW_LINE);
+
+				//Trim the input data (remove the carriage return and the new line return)
+				String receivedString = recievedData.substring(0, recievedData.length()-2);
+				log.info("recieved: " + receivedString);
+
 				//Check if the received data was an ACK command from the device
-				if (recievedData.toString().equals("ACK")) {
+				if (receivedString.equals("ACK")) {
 
 					log.debug("ACK command recieved.  Connection Established.");
-					
+
 					//Print that the connection was established and return true
 					System.out.println("\nConnection Established");
 					return true;
 				}
 			}
-
-			//Print a dot and sleep until another connection request is sent
-			System.out.print(".");
-			Thread.sleep(CONNECT_REQUEST_WAIT_DELAY);
 		}
 	}
 
@@ -139,46 +138,37 @@ public class CommInterface {
 	 * @return true, if successful
 	 * @throws Exception the exception
 	 */
-	public boolean sendCommand(byte commandByte) throws Exception{
+	public boolean sendCommand(int commandInt) throws Exception{
 
-		log.debug("Sending command byte: " + commandByte);
+		byte[] byteArray = new String(Integer.toString(commandInt) + "\r\n").getBytes("ASCII");
+
+		log.debug("Sending ASCII integer byte array: " + byteArray);
 		
 		//Send the byte command
-		outputStream.write(commandByte);
+		outputStream.write(byteArray);
 
-		//Wait for a response
-		Thread.sleep(RECIEVE_WAIT_DELAY);
+		byte recievedByte = 0;
 
-		//If there are bytes available to be read (confirm byte from the device)
-		if (inputStream.available() > 0) {
+		do {
+			recievedByte = (byte) inputStream.read();
+		} while (recievedByte != ASCII_COMFIRM_BYTE);
 
-			//Read only one byte from the buffer
-			byte[] recievedByte = new byte[inputStream.available()];
-			inputStream.read(recievedByte, 0, 1);
+		//If the byte received was a confirmation
+		if ( recievedByte == ASCII_COMFIRM_BYTE ) {
 
-			//If the byte received was a confirmation
-			if ( recievedByte[0] == COMFIRM_COMMAND_BYTE ) {
-				
-				log.debug("Command " + commandByte + " acknowledged.");
-				
-				//Receive the result from the device
-				return true;
-				
-			}
-			else {
-				log.error("Byte not recieved for " + commandByte + " command was not a confirmation byte");
-				log.error("Command byte recieved: " + recievedByte[0]);
-				return false;
-			}
+			log.debug("Receive integer " + byteArray + " acknowledged.");
+
+			//Receive the result from the device
+			return true;
+
 		}
-		
 		else {
-			log.error("There was not data recieved for " + commandByte + " command.");
+			log.error("Byte not recieved for integer ASCII byte array " + byteArray + " was not a confirmation byte");
+			log.error("Byte recieved: " + recievedByte);
 			return false;
 		}
-		
 	}
-	
+
 	/**
 	 * Send byte.
 	 *
@@ -186,38 +176,62 @@ public class CommInterface {
 	 * @return true, if successful
 	 * @throws Exception the exception
 	 */
-	public boolean sendByte(byte dataByte) throws Exception{
+	public boolean sendInteger(int inputInteger) throws Exception{
+		
+		byte[] byteArray = new String(Integer.toString(inputInteger) + "\r\n").getBytes("ASCII");
 
-		log.debug("Sending data byte: " + dataByte);
+		log.debug("Sending ASCII integer byte array: " + byteArray);
 		
 		//Send the byte command
-		outputStream.write(dataByte);
+		outputStream.write(byteArray);
 
-		//Wait for a response
-		Thread.sleep(RECIEVE_WAIT_DELAY);
+		byte recievedByte = 0;
 
-		//If there are bytes available to be read (confirm byte from the device)
-		if (inputStream.available() > 0) {
+		do {
+			recievedByte = (byte) inputStream.read();
+		} while (recievedByte != ASCII_COMFIRM_BYTE);
 
-			//Read only one byte from the buffer
-			byte[] recievedByte = new byte[inputStream.available()];
-			inputStream.read(recievedByte, 0, 1);
+		//If the byte received was a confirmation
+		if ( recievedByte == ASCII_COMFIRM_BYTE ) {
 
-			//If the byte received was a confirmation
-			if ( recievedByte[0] == COMFIRM_COMMAND_BYTE ) {
-				
-				//Receive the result from the device
-				return true;
-				
-			}
-			else {
-				log.error("Byte not recieved for " + dataByte + " data was not a confirmation byte");
-				log.error("Command byte recieved: " + recievedByte[0]);
-				return false;
-			}
+			log.debug("Receive integer " + inputInteger + " acknowledged.");
+
+			//Receive the result from the device
+			return true;
+
 		}
-		log.error("There was no confirmation data recieved for " + dataByte + " data.");
-		return false;
+		else {
+			log.error("Byte not recieved for integer ASCII byte array " + byteArray + " was not a confirmation byte");
+			log.error("Byte recieved: " + recievedByte);
+			return false;
+		}
+	}
+	
+	public boolean sendByte(byte byteToSend) throws Exception{
+		
+		//Send the byte command
+		outputStream.write(byteToSend);
+
+		byte recievedByte = 0;
+
+		do {
+			recievedByte = (byte) inputStream.read();
+		} while (recievedByte != ASCII_COMFIRM_BYTE);
+
+		//If the byte received was a confirmation
+		if ( recievedByte == ASCII_COMFIRM_BYTE ) {
+
+			log.debug("Receive byte " + byteToSend + " acknowledged.");
+
+			//Receive the result from the device
+			return true;
+
+		}
+		else {
+			log.error("Byte not recieved for byte:" + byteToSend + " was not a confirmation byte");
+			log.error("Byte recieved: " + recievedByte);
+			return false;
+		}
 	}
 
 	/**
@@ -226,50 +240,34 @@ public class CommInterface {
 	 * @return the string
 	 * @throws Exception the exception
 	 */
-	public String receiveResult() throws Exception{
-		
+	public String receiveInteger() throws Exception{
+
 		log.info("Expecting data from the remote device");
-		
-		//Wait for the data to be sent
-		Thread.sleep(RECIEVE_WAIT_DELAY);
 
-		//If there are bytes available to be read (some response from the device)
-		if (inputStream.available() > 0) {
-			
-			log.info("Recived data from the remote device");
+		//Initialize the string buffer and received char variable
+		StringBuffer recievedData = new StringBuffer();
+		byte recievedByte = 0;
 
-			//Initialize the string buffer and received char variable
-			StringBuffer receivedData = new StringBuffer();
-			byte receivedByte = 0;
+		//While there are bytes available in the buffer, read them until
+		//a return character in encountered (end of command)
+		do {
+			recievedByte = (byte) inputStream.read();
+			recievedData.append((char)recievedByte);
+		} while (recievedByte != ASCII_NEW_LINE);
 
-			//While there are bytes available in the buffer, read them until
-			//a return character in encountered (end of command)
-			while (inputStream.available() > 0) {
-				receivedByte = (byte) inputStream.read();
-				if (receivedByte != 1) {
-					receivedData.append((char)receivedByte);
-				}
-			}
 
-			//If there was data received, send a confirmation to the device
-			if (receivedData.length() > 0) {
-				
-				log.info("Recived data string: " + receivedData.toString());
-				
-				//Send a confirmation byte
-				log.info("Sending command confirmation byte");
-				outputStream.write(COMFIRM_COMMAND_BYTE);
+		//Trim the input data (remove the carriage return and the new line return)
+		String receivedString = recievedData.substring(0, recievedData.length()-2);
+		log.info("recieved: " + receivedString);
 
-				//Return the result as a string
-				return receivedData.toString();
-			}
-			else {
-				return null;
-			}
-		}
-		else {
-			return null;
-		}
+		log.info("Recived data string: " + receivedString);
+
+		//Send a confirmation byte
+		log.info("Sending command confirmation byte");
+		outputStream.write(ASCII_COMFIRM_BYTE);
+
+		//Return the result as a string
+		return receivedString;
 	}
 
 }
