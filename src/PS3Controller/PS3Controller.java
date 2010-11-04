@@ -149,15 +149,17 @@ public class PS3Controller {
 		//If the steering level has changed a significant amount since the last value sent,
 		//send a new command to the robot.  This cuts down on unneeded communications.
 		if (Math.abs(steerPower - previousSteerPower) > 5) {
+			
+			previousSteerPower = steerPower;
 
 			//If the steer power is positive
 			if (steerPower > 0) {
-				commands.motorTurnRight(Math.abs(steerPower));
+				commands.motorTurnRight(Math.abs(255));
 			}
 			
 			//If the steer power is negative
 			if(steerPower < 0) {
-				commands.motorTurnLeft(Math.abs(steerPower));
+				commands.motorTurnLeft(Math.abs(255));
 			}
 			
 			//If the drive power is 0, center the motors
