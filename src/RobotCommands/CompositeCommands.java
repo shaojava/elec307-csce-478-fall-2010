@@ -142,5 +142,37 @@ public class CompositeCommands extends BaseCommands {
 
 		return hallDistance;
 	}
+	
+	public void accelerate(int startPower, int finalPower, int timeMilliseconds) throws Exception {
+		
+		assert (finalPower >= startPower);
+		
+		double incrementInterval = timeMilliseconds / (finalPower-startPower);
+		
+		int currentPower = startPower;
+		
+		while (currentPower < finalPower) {
+			super.motorDriveForward(currentPower);
+			currentPower++;
+			Thread.sleep(Math.round(incrementInterval));
+		}
+		
+	}
+	
+	public void deaccelerate(int startPower, int finalPower, int timeMilliseconds) throws Exception {
+		
+		assert (startPower <= finalPower);
+		
+		double incrementInterval = timeMilliseconds / (startPower - finalPower);
+		
+		int currentPower = startPower;
+		
+		while (currentPower > finalPower) {
+			super.motorDriveForward(currentPower);
+			currentPower--;
+			Thread.sleep(Math.round(incrementInterval));
+		}
+		
+	}
 
 }

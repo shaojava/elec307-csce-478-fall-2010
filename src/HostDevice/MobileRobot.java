@@ -26,10 +26,9 @@ public class MobileRobot {
 			//Instantiate a MobileRobot commands object
 			CompositeCommands commands = new CompositeCommands(serialInterface);
 			
-			while(true) {
-				System.out.println(commands.getIRFront());
-				Thread.sleep(1000);
-			}
+			commands.accelerate(50, 255, 10000);
+			commands.deaccelerate(255, 50, 10000);
+			commands.motorStop();
 			
 			//System.exit(0);
 		}

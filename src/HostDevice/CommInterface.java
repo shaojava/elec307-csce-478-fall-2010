@@ -97,6 +97,7 @@ public class CommInterface {
 			byte[] synCommand = new String("SYN\r\n").getBytes("ASCII");
 			log.info("Writing SYN command to comm port: " + synCommand);
 			outputStream.write(synCommand);
+			outputStream.flush();
 
 			//If there are bytes available to be read (some response from the device)
 			if (inputStream.available() > 0) {
@@ -121,7 +122,7 @@ public class CommInterface {
 				//Check if the received data was an ACK command from the device
 				if (receivedString.equals("ACK")) {
 
-					log.debug("ACK command recieved.  Connection Established.");
+					log.info("ACK command recieved.  Connection Established.");
 
 					//Print that the connection was established and return true
 					System.out.println("\nConnection Established");
@@ -142,10 +143,11 @@ public class CommInterface {
 
 		byte[] byteArray = new String(Integer.toString(commandInt) + "\r\n").getBytes("ASCII");
 
-		log.debug("Sending ASCII integer byte array: " + byteArray);
+		log.info("Sending ASCII integer byte array: " + byteArray);
 		
 		//Send the byte command
 		outputStream.write(byteArray);
+		outputStream.flush();
 
 		byte recievedByte = 0;
 
@@ -156,7 +158,7 @@ public class CommInterface {
 		//If the byte received was a confirmation
 		if ( recievedByte == ASCII_COMFIRM_BYTE ) {
 
-			log.debug("Receive integer " + byteArray + " acknowledged.");
+			log.info("Receive integer " + byteArray + " acknowledged.");
 
 			//Receive the result from the device
 			return true;
@@ -180,10 +182,11 @@ public class CommInterface {
 		
 		byte[] byteArray = new String(Integer.toString(inputInteger) + "\r\n").getBytes("ASCII");
 
-		log.debug("Sending ASCII integer byte array: " + byteArray);
+		log.info("Sending ASCII integer byte array: " + byteArray);
 		
 		//Send the byte command
 		outputStream.write(byteArray);
+		outputStream.flush();
 
 		byte recievedByte = 0;
 
@@ -202,33 +205,6 @@ public class CommInterface {
 		}
 		else {
 			log.error("Byte not recieved for integer ASCII byte array " + byteArray + " was not a confirmation byte");
-			log.error("Byte recieved: " + recievedByte);
-			return false;
-		}
-	}
-	
-	public boolean sendByte(byte byteToSend) throws Exception{
-		
-		//Send the byte command
-		outputStream.write(byteToSend);
-
-		byte recievedByte = 0;
-
-		do {
-			recievedByte = (byte) inputStream.read();
-		} while (recievedByte != ASCII_COMFIRM_BYTE);
-
-		//If the byte received was a confirmation
-		if ( recievedByte == ASCII_COMFIRM_BYTE ) {
-
-			log.debug("Receive byte " + byteToSend + " acknowledged.");
-
-			//Receive the result from the device
-			return true;
-
-		}
-		else {
-			log.error("Byte not recieved for byte:" + byteToSend + " was not a confirmation byte");
 			log.error("Byte recieved: " + recievedByte);
 			return false;
 		}
@@ -265,6 +241,7 @@ public class CommInterface {
 		//Send a confirmation byte
 		log.info("Sending command confirmation byte");
 		outputStream.write(ASCII_COMFIRM_BYTE);
+		outputStream.flush();
 
 		//Return the result as a string
 		return receivedString;
