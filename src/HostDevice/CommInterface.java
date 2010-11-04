@@ -95,7 +95,8 @@ public class CommInterface {
 
 			//Send a SYN command
 			byte[] synCommand = new String("SYN\r\n").getBytes("ASCII");
-			log.info("Writing SYN command to comm port: " + synCommand);
+			
+			log.info("Writing SYN command to comm port: " + synCommand.toString());
 			outputStream.write(synCommand);
 			outputStream.flush();
 
@@ -117,7 +118,7 @@ public class CommInterface {
 
 				//Trim the input data (remove the carriage return and the new line return)
 				String receivedString = recievedData.substring(0, recievedData.length()-2);
-				log.info("recieved: " + receivedString);
+				log.info("Data recieved: " + receivedString);
 
 				//Check if the received data was an ACK command from the device
 				if (receivedString.equals("ACK")) {
@@ -143,7 +144,7 @@ public class CommInterface {
 
 		byte[] byteArray = new String(Integer.toString(commandInt) + "\r\n").getBytes("ASCII");
 
-		log.info("Sending ASCII integer byte array: " + byteArray);
+		log.info("Send Command " + commandInt + ": Sending command as ASCII integer byte array");
 		
 		//Send the byte command
 		outputStream.write(byteArray);
@@ -158,15 +159,15 @@ public class CommInterface {
 		//If the byte received was a confirmation
 		if ( recievedByte == ASCII_COMFIRM_BYTE ) {
 
-			log.info("Receive integer " + byteArray + " acknowledged.");
+			log.info("Send Command" + commandInt + ": Receive integer byte array acknowledged by device.");
 
 			//Receive the result from the device
 			return true;
 
 		}
 		else {
-			log.error("Byte not recieved for integer ASCII byte array " + byteArray + " was not a confirmation byte");
-			log.error("Byte recieved: " + recievedByte);
+			log.error("Send Command " + commandInt + ":Byte not recieved for integer ASCII byte array " + byteArray + " was not a confirmation byte");
+			log.error("Send Command " + commandInt + ":Byte recieved: " + recievedByte);
 			return false;
 		}
 	}
@@ -182,7 +183,7 @@ public class CommInterface {
 		
 		byte[] byteArray = new String(Integer.toString(inputInteger) + "\r\n").getBytes("ASCII");
 
-		log.info("Sending ASCII integer byte array: " + byteArray);
+		log.info("Send Integer " + inputInteger + ": Sending integer as ASCII integer byte array");
 		
 		//Send the byte command
 		outputStream.write(byteArray);
@@ -197,15 +198,15 @@ public class CommInterface {
 		//If the byte received was a confirmation
 		if ( recievedByte == ASCII_COMFIRM_BYTE ) {
 
-			log.debug("Receive integer " + inputInteger + " acknowledged.");
+			log.debug("Send Integer " + inputInteger + ": Receive integer " + inputInteger + " acknowledged by device.");
 
 			//Receive the result from the device
 			return true;
 
 		}
 		else {
-			log.error("Byte not recieved for integer ASCII byte array " + byteArray + " was not a confirmation byte");
-			log.error("Byte recieved: " + recievedByte);
+			log.error("Send Integer " + inputInteger + ":Byte not recieved for integer ASCII byte array " + byteArray + " was not a confirmation byte");
+			log.error("Send Integer " + inputInteger + ":Byte recieved: " + recievedByte);
 			return false;
 		}
 	}
@@ -218,7 +219,7 @@ public class CommInterface {
 	 */
 	public String receiveInteger() throws Exception{
 
-		log.info("Expecting data from the remote device");
+		log.info("Recieve Integer: Expecting to recieve ASCII integer from the remote device");
 
 		//Initialize the string buffer and received char variable
 		StringBuffer recievedData = new StringBuffer();
@@ -234,12 +235,10 @@ public class CommInterface {
 
 		//Trim the input data (remove the carriage return and the new line return)
 		String receivedString = recievedData.substring(0, recievedData.length()-2);
-		log.info("recieved: " + receivedString);
-
-		log.info("Recived data string: " + receivedString);
+		log.info("Recieve Integer: Recieved " + receivedString);
 
 		//Send a confirmation byte
-		log.info("Sending command confirmation byte");
+		log.info("Recieve Integer: Sending command confirmation byte.");
 		outputStream.write(ASCII_COMFIRM_BYTE);
 		outputStream.flush();
 

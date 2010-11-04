@@ -2,8 +2,17 @@ package RobotCommands;
 
 import HostDevice.CommInterface;
 
+// TODO: Auto-generated Javadoc
+/**
+ * The Class CompositeCommands.
+ */
 public class CompositeCommands extends BaseCommands {
 
+	/**
+	 * Instantiates a new composite commands.
+	 *
+	 * @param serial the serial
+	 */
 	public CompositeCommands(CommInterface serial) {
 		super(serial);
 	}
@@ -134,15 +143,22 @@ public class CompositeCommands extends BaseCommands {
 	 * @return the hall distance
 	 * @throws Exception the exception
 	 */
-	public double getHallDistance() throws Exception {
+	public double getDistanceTraveled() throws Exception {
 
-		//If the command byte was received, return the value
-		double hallCount = 0;
-		double hallDistance = (Math.PI * hallCount) / 6;
+		double hallCount = super.getHallCount();
+		double hallDistance = ((Math.PI * 2) * hallCount) / 6;
 
 		return hallDistance;
 	}
 	
+	/**
+	 * Accelerate.
+	 *
+	 * @param startPower the start power
+	 * @param finalPower the final power
+	 * @param timeMilliseconds the time milliseconds
+	 * @throws Exception the exception
+	 */
 	public void accelerate(int startPower, int finalPower, int timeMilliseconds) throws Exception {
 		
 		assert (finalPower >= startPower);
@@ -159,6 +175,14 @@ public class CompositeCommands extends BaseCommands {
 		
 	}
 	
+	/**
+	 * Deaccelerate.
+	 *
+	 * @param startPower the start power
+	 * @param finalPower the final power
+	 * @param timeMilliseconds the time milliseconds
+	 * @throws Exception the exception
+	 */
 	public void deaccelerate(int startPower, int finalPower, int timeMilliseconds) throws Exception {
 		
 		assert (startPower <= finalPower);
