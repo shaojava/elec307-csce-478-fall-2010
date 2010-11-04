@@ -1,110 +1,173 @@
+#define WAIT 1000
+#define INITWAIT 500
+#include <Wire.h>
+#include <avr/sleep.h>
+
 void setup() {
   delay(500);
-  
+
   //Initialize the LCD Display
   initLCDScreen();
   delay(1000);
-  
+
+  //Display project title
+  LCDPrintLine("Presenting:", 1, 0);
+  LCDPrintLine("Mobile Robot", 2, 0);
+  delay(WAIT);
+
+  //Display authors
+  LCDPrintLine("by: Micheal K", 1, 0);
+  LCDPrintLine(" and Bryan B", 2, 0);
+  delay(WAIT);
+
   //Display the splash screen
   LCDPrintLine("University of", 1, 0);
   LCDPrintLine("Nebraska-Linc", 2, 0);
-  delay(5000);
-  
+  delay(WAIT);
+
   //Initialize the Accelerometer
   initAccelerometer();
-  delay(1000);
-  
+  delay(INITWAIT);
+
+  //Initialize the Compass
+  //Wire.begin();
+  //initCompass();
+  //delay(WAIT);
+
+  //Initialize Motor Controls
+  initMotors();
+  delay(INITWAIT);
+
   //Initalize the hall effect sensor
-  //initHallSensor();
-  //delay(1000);
-  
+  initHallSensor();
+  delay(INITWAIT);
+
   //Initalize IR sensors
-  //initIRSensors();
-  //delay(1000);
-  
+  initIRSensors();
+  delay(INITWAIT);
+
   //Initialize the FM serial port
-  LCDPrintLine("Initializing", 1, 0);
-  LCDPrintLine("FM Transmitter", 2, 0);
-  Serial.begin(4800);
-  
+  initFMTransmitter();
+  delay(INITWAIT);
+
+  //Begin Serial connection
+  Serial1.begin(115200);
+
   //Clear the Screen
   LCDClearScreen();
-  delay(1000);
-  
+  delay(INITWAIT);
+
   //Establish connection with the laptop
   establishConnection();
+  
 
 }
 
 void loop() {
-  //Serial.print(accelGetX());
-  // put your main code here, to run repeatedly: 
-  //Serial.print("Ping");
-  //delay(1000);
-  //LCDClearScreen();
-  
+
+  Serial1.flush();
   switch(fmWaitForCommand()) {
-    
-    //Get accelerometer X axis
-    case 0x02:
-      fmSendValue(accelGetX());
-      break;
-      
+
+    //Get  X axis
+  case 2:
+    fmSendInteger(accelGetX());
+    break;
+
     //Get accelerometer Y axis
-    case 0x03:
-      fmSendValue(accelGetY());
-      break;
-    
+  case 3:
+    fmSendInteger(accelGetY());
+    break;
+
     //Get accelerometer Z axis
-    case 0x04:
-      fmSendValue(accelGetZ());
-      break;
-      
+  case 4:
+    fmSendInteger(accelGetZ());
+    break;
+
     //Set the accelerometer sensitivity
-    case 0x05:
-      accelSetSensitivity((int)fmReceiveByte());
-      break;
-      
+  case 5:
+    accelSetSensitivity(fmReceiveInt());
+    break;
+
     //Sleep the Accelerometer
-    case 0x06:
-      accelSleep();
-      break;
-    
+  case 6:
+    accelSleep();
+    break;
+
     //Wake the Accelerometer
-    case 0x07:
-      accelWake();
-      break;
-      
+  case 7:
+    accelWake();
+    break;
+
     //Get front IR sensor
-    case 0x08:
-      fmSendValue(irGetFront());
-      break;
-      
+  case 8:
+    fmSendInteger(irGetFront());
+    break;
+
     //Get left IR sensor
-    case 0x09:
-      fmSendValue(irGetLeft());
-      break;
-      
+  case 9:
+    fmSendInteger(irGetLeft());
+    break;
+
     //Get right IR sensor
-    case 0x0a:
-      fmSendValue(irGetRight());
-      break;
-      
+  case 10:
+    fmSendInteger(irGetRight());
+    break;
+
     //Get back IR sensor
-    case 0x0b:
-      fmSendValue(irGetBack());
-      break;
-      
+  case 11:
+    fmSendInteger(irGetBack());
+    break;
+
     //Get bottom IR sensor
-    case 0x0c:
-      fmSendValue(irGetBottom());
-      break;
-      
-    //LCD Print Line
-    case 0x0d:
-      char* line = fmReceiveChars();
-      LCDPrintLine(line, 1, 0);
-      break;
-  }
-}
+  case 12:
+    fmSendInteger(irGetBottom());
+    break;
+
+  //Motor Controller Drive Forward
+  case 13:
+    mcForward(fmReceiveInt());
+    break;
   
+  //Motor Controller Drive Reverse
+  case 14:
+    mcReverse(fmReceiveInt());
+    break;
+  
+  //Motor Controller Turn Left
+  case 15:
+    mcLeft(fmReceiveInt());
+    break;
+  
+  //Motor Controller Turn Right
+  case 16:
+    mcRight(fmReceiveInt());
+    break;
+  
+  //Motor Controller Stop
+  case 17:
+    mcStop();
+    break;
+  
+  //Motor Controller Center Steering
+  case 18:
+    mcCenter();
+    break;
+  
+  //Get the Hall Effect Sensor Count
+  case 19:
+    fmSendInteger(hallGetCount());
+    break;
+    
+  //Reset Hall Efect Sensor
+  case 20:
+    hallResetCount();
+    break;
+    
+  default:
+    break;
+  } 
+
+}
+
+
+

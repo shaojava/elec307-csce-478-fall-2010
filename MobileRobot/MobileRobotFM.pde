@@ -1,6 +1,15 @@
 #define INLENGTH 16
 #define INTERMINATOR 13
-#define COMMAND_RECV_WAIT 25
+#define COMMAND_RECV_WAIT 30
+#define ASCII_CONFIRM_BYTE 0x06
+
+//Initialize the Accelerometer
+void initFMTransmitter() {
+
+  //Print status message
+  LCDPrintLine("Initializing", 1, 0);
+  LCDPrintLine("FM Transmitter", 2, 0);
+}
 
 //Establish a connection with the host machine
 void establishConnection() {
@@ -12,22 +21,16 @@ void establishConnection() {
 
   //Wait for some response
   while (true) {
-    
-    //Read any availible bytes from the serial line
-    char* buffer = fmEstablishReceiveChars();
-      //Check to see if it was a connection request from the host computer (SYN)
-    if (strcmp(buffer, "SYN") == 0) {
+
+    //Check to see if it was a connection request from the host computer (SYN)
+    if (fmReceiveString().equals("SYN")) {
       //Respond to the connection request
-      Serial.print("ACK");
-      
-      //Flush any additional SYN requests from the buffer
-      Serial.flush();
-      
+      Serial1.println("ACK");
+
       //Inform the user that the connection was established
       LCDPrintLine("Connection", 1, 0);
       LCDPrintLine("Established", 2, 0);
-      delay(1000);
-      
+
       //Stop waiting for a connection request.  Break from the loop.
       break;
     }
@@ -35,68 +38,81 @@ void establishConnection() {
 }
 
 //Read any availible bytes from the FM transmitter
-char* fmEstablishReceiveChars() {
-  
-  //Initialize the count to 0
-  int byteCount = 0;
-  int availableBytes = Serial.available();
-  
-  //Initialize a char array to store the serial data
-  char serialData[availableBytes+1];
+String fmReceiveString() {
 
-  //While there are bytes in the buffer and the amount of bytes in the 
-  //buffer hasn't exceeded the maximum command length
-  while (Serial.available()) {
-    
-    //Read one byte from the buffer and add it to the input
-    serialData[byteCount] = Serial.read();
-    
-    //Increase the amount of bytes read
-    byteCount++;
+  while(!Serial1.available()) {
+    //Wait
   }
+
+  String receivedString;
+  byte receivedByte = -1;
+
+  do {
+    if(Serial1.available()) {
+      receivedByte = Serial1.read();
   
-  //Null terminate the string so that it can be user with std C++ libraries
-  serialData[availableBytes] = 0;
+      //Read one byte from the buffer and add it to the input
+      receivedString += (char) receivedByte;
+    }
+
+  } 
+  while (receivedByte != 0x0a);
+
   //Return the read serial data
-  return serialData;
+  return receivedString.trim();
 } 
 
-byte fmWaitForCommand() {
-  byte commandByte = 0x00;
-  
-  //Wait indefinitely for a command byte
-  while(true) {
-    
-    //If something has been recieved
-    if(Serial.available()) {
-      
-      //Read a single byte
-      commandByte = Serial.read();
-      
-      //Send a confirmation byte
-      Serial.write(0x01);
-      
-      //We're done waiting, break the loop
-      break;
-    } 
+int fmWaitForCommand() {
+  while(!Serial1.available()) {
+    //Wait
   }
+
+  String receivedString;
+  byte receivedByte = 0;
+
+  do {
+    
+    if(Serial1.available()) {
+      receivedByte = Serial1.read();
   
-  //Return the recieved command
-  return commandByte;
+      //Read one byte from the buffer and add it to the input
+      receivedString += (char) receivedByte;
+    }
+
+  } while (receivedByte != 0x0a);
+
+  Serial1.write(ASCII_CONFIRM_BYTE);
+
+  //Return the read serial data
+  receivedString.trim();
+
+  char temp[20];
+
+  receivedString.toCharArray(temp, 19);
+  int convertedInt = atoi(temp);
+  if (convertedInt == 0 && receivedString != "0")
+  {
+    convertedInt = -1;
+  }
+
+  return convertedInt;
 }
 
-boolean fmSendValue(int sendData) {
+boolean fmSendInteger(int sendData) {
   
   //Send the data over the serial connection
-  Serial.print(sendData, DEC);
+  Serial1.println(sendData, DEC);
+
+  //Read one byte from the serial line
+  byte byteResponse = 0;
   
-  delay(COMMAND_RECV_WAIT);
-    
-  //Read any availible bytes from the serial line
-  byte byteResponse = Serial.read();
-    
+  do {
+    byteResponse = Serial1.read();
+  } 
+  while (byteResponse != ASCII_CONFIRM_BYTE);
+
   //Check to see if it was a connection request from the host computer (SYN)
-  if (byteResponse == 0x01) {
+  if (byteResponse == ASCII_CONFIRM_BYTE) {
     return true; 
   }
   else  {
@@ -105,56 +121,58 @@ boolean fmSendValue(int sendData) {
 }
 
 byte fmReceiveByte() {
-  
-  //Wait
-  delay(COMMAND_RECV_WAIT);
-  
+
   byte byteResponse;
-    
-  //Read any availible bytes from the serial line
-  if(Serial.available()) {
-    byteResponse = Serial.read();
-    Serial.write(0x01);
+
+  while(!Serial1.available()) {
+    //Do nothing
   }
-    
+
+  byteResponse = Serial.read();
+  Serial1.write(ASCII_CONFIRM_BYTE);
+
   //Check to see if it was a connection request from the host computer (SYN)
   return byteResponse;
 }
 
-char* fmReceiveChars() {
-  
-  delay(COMMAND_RECV_WAIT);
-  
-  //Initialize the count to 0
-  int byteCount = 0;
-  int availableBytes = Serial.available();
-  
-  //Initialize a char array to store the serial data
-  char serialData[availableBytes+1];
+int fmReceiveInt() {
 
-  //While there are bytes in the buffer and the amount of bytes in the 
-  //buffer hasn't exceeded the maximum command length
-  while (Serial.available()) {
-    
-    //Read one byte from the buffer and add it to the input
-    serialData[byteCount] = Serial.read();
-    
-    //Increase the amount of bytes read
-    byteCount++;
+  while(!Serial1.available()) {
+    //Wait
   }
+
+  String receivedString;
+  byte receivedByte = 0;
+
+  do {
+    if(Serial1.available()) {
+      receivedByte = Serial1.read();
   
-  //If there was data recieved
-  if (sizeof(serialData) > 1) {
-    //Send a confirmation byte
-      Serial.write(0x01);
-  }
-  
-  //Null terminate the string so that it can be user with std C++ libraries
-  serialData[availableBytes] = 0;
+      //Read one byte from the buffer and add it to the input
+      receivedString += (char) receivedByte;
+    }
+
+  } 
+  while (receivedByte != 0x0a);
+
+  Serial1.write(ASCII_CONFIRM_BYTE);
+
   //Return the read serial data
-  return serialData;
-} 
-  
+  receivedString.trim();
+
+  char temp[20];
+
+  receivedString.toCharArray(temp, 19);
+  int convertedInt = atoi(temp);
+  if (convertedInt == 0 && receivedString != "0")
+  {
+    convertedInt = -1;
+  }
+
+  return convertedInt;
+
+}
+
 
 
 

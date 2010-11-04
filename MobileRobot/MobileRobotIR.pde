@@ -11,11 +11,10 @@
 //Initialize the IR sensors (make sure that there is some value on
 //all of the IR ports (they are plugged in and functioning
 void initIRSensors() {
-  //assert(analogRead(irFront) > 0);
-  //assert(analogRead(irLeft) > 0);
-  //assert(analogRead(irRight) > 0);
-  //assert(analogRead(irBack) > 0);
-  //assert(analogRead(irBottom) > 0);
+  
+  //Print status message
+  LCDPrintLine("Initializing", 1, 0);
+  LCDPrintLine("IR Sensors", 2, 0);
 }
 
 //Getter method for the front IR sensor
@@ -77,3 +76,42 @@ int irGetBottom() {
   average /= irNorm;
   return round(average);
 }
+
+//Print the raw IR value to the LCD
+void irPrint(int sensor) {
+  
+  //Switch on the sensor value
+  switch(sensor) {
+    
+  //The front IR sensor
+  case 0:
+    LCDPrintLine("Front IR",1, 0);
+    LCDPrintLine(irGetFront(), 2, 0);
+    break;
+    
+  //The left IR sensor
+  case 1:
+    LCDPrintLine("Left IR",1, 0);
+    LCDPrintLine(irGetLeft(), 2, 0);
+    break;
+    
+  //The right IR sensor
+  case 2:
+    LCDPrintLine("Right IR",1, 0);
+    LCDPrintLine(irGetRight(), 2, 0);
+    break;
+    
+  //The back IR sensor
+  case 3:
+    LCDPrintLine("Back IR",1, 0);
+    LCDPrintLine(irGetBack(), 2, 0);
+    break;
+    
+  //The bottom IR sensor
+  case 4:
+    LCDPrintLine("Bottom IR",1, 0);
+    LCDPrintLine(irGetBottom(), 2, 0);
+    break;
+  }
+}
+  

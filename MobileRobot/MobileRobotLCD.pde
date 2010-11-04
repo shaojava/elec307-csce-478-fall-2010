@@ -78,3 +78,8 @@ void LCDClearLine(int row) {
 void LCDClearScreen() {
   lcd.clear(); 
 }
+
+//print this!
+void BryansTestPrint(int value) {
+  lcd.print(value);
+}
