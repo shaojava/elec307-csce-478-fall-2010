@@ -1,9 +1,14 @@
 package PS3Controller;
 
+import org.apache.log4j.Logger;
+
+import HostDevice.CommInterface;
 import RobotCommands.CompositeCommands;
 import net.java.games.input.Component;
 import net.java.games.input.Controller;
 import net.java.games.input.ControllerEnvironment;
+import net.java.games.input.Event;
+import net.java.games.input.EventQueue;
 
 
 // TODO: Auto-generated Javadoc
@@ -11,6 +16,8 @@ import net.java.games.input.ControllerEnvironment;
  * The Class PS3Controller.
  */
 public class PS3Controller {
+	
+	private Logger log;
 
 	/** The PS3 controller. */
 	private Controller PS3Controller;
@@ -24,6 +31,24 @@ public class PS3Controller {
 	/** The right x axis component. */
 	private int RIGHT_X_AXIS = 2;
 
+	/** The Triangle button. */
+	private int TRIANGLE_BUTTON = 12;
+
+	/** The X button. */
+	private int X_BUTTON = 14;
+
+	/** The DPAD Up button. */
+	private int DPAD_UP_BUTTON = 4;
+
+	/** The DPAD Down button. */
+	private int DPAD_DOWN_BUTTON = 6;
+
+	/** The DPAD Left button. */
+	private int DPAD_LEFT_BUTTON = 7;
+
+	/** The DPAD Right button. */
+	private int DPAD_RIGHT_BUTTON = 5;
+
 	/** The previous drive power. */
 	private int previousDrivePower = 0;
 
@@ -34,6 +59,9 @@ public class PS3Controller {
 	 * Instantiates a new PS3 controller.
 	 */
 	public PS3Controller() {
+		
+		log = Logger.getLogger(PS3Controller.class);
+		log.info("PS3 Controller Class Instanciated");
 
 		//Get the list of the connected controllers
 		Controller [] controllerList = ControllerEnvironment.getDefaultEnvironment().getControllers();
@@ -43,6 +71,7 @@ public class PS3Controller {
 
 			//If the controller in the list is the PS3 controller, save it
 			if(controllerList[i].getName().equals("PLAYSTATION(R)3 Controller")) {
+				log.info("Found PS3 controller on channel " + i);
 				PS3Controller = controllerList[i];
 			}
 
@@ -132,46 +161,92 @@ public class PS3Controller {
 
 			//If the drive power is positive
 			if (drivePower > 0) {
+				log.info("Changing forward drive power to " + drivePower);
 				commands.motorDriveForward(Math.abs(drivePower));
 			}
 
 			//If the drive power is negative
 			if(drivePower < 0) {
+				log.info("Changing reverse drive power to " + drivePower);
 				commands.motorDriveReverse(Math.abs(drivePower));
 			}
-			
+
 			//If the drive power is 0, stop the motors
 			if(drivePower == 0) {
+				log.info("Changing drive power to 0");
 				commands.motorStop();
 			}
 		}
-		
+
 		//If the steering level has changed a significant amount since the last value sent,
 		//send a new command to the robot.  This cuts down on unneeded communications.
 		if (Math.abs(steerPower - previousSteerPower) > 5) {
-			
+
 			previousSteerPower = steerPower;
 
 			//If the steer power is positive
 			if (steerPower > 0) {
+				log.info("Changing right steering power to 255");
 				commands.motorTurnRight(Math.abs(255));
 			}
-			
+
 			//If the steer power is negative
 			if(steerPower < 0) {
+				log.info("Changing left steering power to 255");
 				commands.motorTurnLeft(Math.abs(255));
 			}
-			
+
 			//If the drive power is 0, center the motors
 			if(steerPower == 0) {
+				log.info("Changing steering power to 0 (centering)");
 				commands.motorCenter();
 			}
 		}
 
-		//Console output (for temp debug)
-		System.out.println(drivePower + " " + steerPower);
+		//Establish an event queue for the PS3 controller
+		EventQueue queue = PS3Controller.getEventQueue();
+		Event event = new Event();
+
+		while(queue.getNextEvent(event)) {
+
+			//Get the next component in the event queue
+			Component comp = event.getComponent();
+
+			//If the component was the DPAD Up button
+			if(comp.getName().equals(Integer.toString(DPAD_UP_BUTTON)) && comp.getPollData() == 1.0f) {
+				log.info("DPAD up button press found in the event queue");
+				commands.menuUp();
+			}
+
+			//If the component was the DPAD Down button
+			if(comp.getName().equals(Integer.toString(DPAD_DOWN_BUTTON)) && comp.getPollData() == 1.0f) {
+				log.info("DPAD down button press found in the event queue");
+				commands.menuDown();
+			}
+
+			//If the component was the DPAD Left button
+			if(comp.getName().equals(Integer.toString(DPAD_LEFT_BUTTON)) && comp.getPollData() == 1.0f) {
+				log.info("DPAD left button press found in the event queue");
+				commands.menuLeft();
+			}
+
+			//If the component was the DPAD Right button
+			if(comp.getName().equals(Integer.toString(DPAD_RIGHT_BUTTON)) && comp.getPollData() == 1.0f) {
+				log.info("DPAD right button press found in the event queue");
+				commands.menuRight();
+			}
+
+			//If the component was the X button
+			if(comp.getName().equals(Integer.toString(X_BUTTON)) && comp.getPollData() == 1.0f) {
+				log.info("X button press found in the event queue");
+				commands.menuSelect();
+			}
+
+			//If the component was the Triangle button
+			if(comp.getName().equals(Integer.toString(TRIANGLE_BUTTON)) && comp.getPollData() == 1.0f) {
+				log.info("Triangle button press found in the event queue");
+				commands.menuBack();
+			}
+		}
 	}
-
-
-
 }

@@ -29,7 +29,7 @@ public class MobileRobot {
 			
 			//Instantiate new PS3 controller object
 			PS3Controller controller = new PS3Controller();
-
+			
 			//Wait
 			Thread.sleep(1000);
 			
@@ -38,6 +38,7 @@ public class MobileRobot {
 				
 				//Use the PS3 controller object to send commands to the robot 
 				controller.sendRobotCommands(commands);
+				//System.out.println(commands.getAccelerometerX());
 				
 				//Wait
 				Thread.sleep(10);

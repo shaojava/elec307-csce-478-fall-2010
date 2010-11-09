@@ -16,6 +16,7 @@ public class BaseCommands {
 	/** The serial interface. */
 	protected CommInterface serialInterface;
 	
+	/** The log. */
 	private Logger log;
 	
 	/**
@@ -372,6 +373,102 @@ public class BaseCommands {
 		//If the command byte was received, send the power level
 		//If the power level was received, return true
 		if (serialInterface.sendCommand(18)) {
+			return true;
+		}
+		else {
+			return false;
+		}
+	}
+	
+	/**
+	 * Menu up.
+	 *
+	 * @return true, if successful
+	 * @throws Exception the exception
+	 */
+	public boolean menuUp() throws Exception {
+		
+		if (serialInterface.sendCommand(21)) {
+			return true;
+		}
+		else {
+			return false;
+		}
+	}
+	
+	/**
+	 * Menu down.
+	 *
+	 * @return true, if successful
+	 * @throws Exception the exception
+	 */
+	public boolean menuDown() throws Exception {
+		
+		if (serialInterface.sendCommand(22)) {
+			return true;
+		}
+		else {
+			return false;
+		}
+	}
+	
+	/**
+	 * Menu left.
+	 *
+	 * @return true, if successful
+	 * @throws Exception the exception
+	 */
+	public boolean menuLeft() throws Exception {
+		
+		if (serialInterface.sendCommand(23)) {
+			return true;
+		}
+		else {
+			return false;
+		}
+	}
+	
+	/**
+	 * Menu right.
+	 *
+	 * @return true, if successful
+	 * @throws Exception the exception
+	 */
+	public boolean menuRight() throws Exception {
+		
+		if (serialInterface.sendCommand(24)) {
+			return true;
+		}
+		else {
+			return false;
+		}
+	}
+	
+	/**
+	 * Menu select.
+	 *
+	 * @return true, if successful
+	 * @throws Exception the exception
+	 */
+	public boolean menuSelect() throws Exception {
+		
+		if (serialInterface.sendCommand(25)) {
+			return true;
+		}
+		else {
+			return false;
+		}
+	}
+	
+	/**
+	 * Menu back.
+	 *
+	 * @return true, if successful
+	 * @throws Exception the exception
+	 */
+	public boolean menuBack() throws Exception {
+		
+		if (serialInterface.sendCommand(26)) {
 			return true;
 		}
 		else {
