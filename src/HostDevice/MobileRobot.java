@@ -1,5 +1,7 @@
 package HostDevice;
 
+import org.apache.log4j.Logger;
+
 import PS3Controller.PS3Controller;
 import RobotCommands.BaseCommands;
 import RobotCommands.CompositeCommands;
@@ -10,6 +12,8 @@ import RobotCommands.CompositeCommands;
  */
 public class MobileRobot {
 
+	private static Logger log;
+
 	/**
 	 * The main method.
 	 *
@@ -18,33 +22,41 @@ public class MobileRobot {
 	 */
 	public static void main(String[] args) throws Exception{
 
+		log = Logger.getLogger(PS3Controller.class);
+		log.info("Host Device Program Started");
+
 		//Establish IO port with machine communications port using the machine name for the port
+		log.info("Starting the serial interface input and output stream.");
 		CommInterface serialInterface = new CommInterface("/dev/tty.usbserial-A700eEl4");
 
 		//If the connection was successful
+		log.info("Attempting to establish connection with the mobile device");
 		if (serialInterface.establishConnection()) {
 
 			//Instantiate new robot commands object
+			log.info("Instantiating a composite commands interface object");
 			CompositeCommands commands = new CompositeCommands(serialInterface);
-			
-			//Instantiate new PS3 controller object
-			PS3Controller controller = new PS3Controller();
-			
-			//Wait
-			Thread.sleep(1000);
-			
-			//Do this forever
-			while(true) {
+
+			//Try to Instantiate a PS3 controller object
+			//Will fail if the controller is not connected
+			try {
 				
-				//Use the PS3 controller object to send commands to the robot 
-				controller.sendRobotCommands(commands);
-				//System.out.println(commands.getAccelerometerX());
-				
+				//Instantiate new PS3 controller object
+				log.info("Instantiating a PS3 Controller object");
+				PS3Controller controller = new PS3Controller();
+
 				//Wait
-				Thread.sleep(10);
+				Thread.sleep(1000);
+
+				//Start manual control with 10ms delay times
+				//This will loop until the start button is pressed on the controller
+				controller.manualControl(commands, 10);
+				
+			} catch (Exception e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+				log.error(e.getStackTrace().toString());
 			}
 		}
-
-
 	}
 }

@@ -38,12 +38,14 @@ public class BaseCommands {
 	public int getAccelerometerX() throws Exception {
 		
 		//Send the command byte
+		log.info("Sending get accelerometer X command");
 		if (serialInterface.sendCommand(2)) {
 			
 			//If the command byte was received, return the value
 			return Integer.parseInt(serialInterface.receiveInteger().trim());
 		}
 		else {
+			log.error("Error getting accelerometer X value");
 			return -1;
 		}
 	}
@@ -57,12 +59,14 @@ public class BaseCommands {
 	public int getAccelerometerY() throws Exception {
 		
 		//Send the command byte
+		log.info("Sending get accelerometer Y command");
 		if (serialInterface.sendCommand(3)) {
 			
 			//If the command byte was received, return the value
 			return Integer.parseInt(serialInterface.receiveInteger().trim());
 		}
 		else {
+			log.error("Error getting accelerometer y value");
 			return -1;
 		}
 	}
@@ -76,12 +80,14 @@ public class BaseCommands {
 	public int getAccelerometerZ() throws Exception {
 		
 		//Send the command byte
+		log.info("Sending get accelerometer Z command");
 		if (serialInterface.sendCommand(4)) {
 			
 			//If the command byte was received, return the value
 			return Integer.parseInt(serialInterface.receiveInteger().trim());
 		}
 		else {
+			log.error("Error getting accelerometer Z value");
 			return -1;
 		}
 	}
@@ -97,10 +103,12 @@ public class BaseCommands {
 		
 		//If the sensitivity value is not in the correct range, return false
 		if (sensitivity < 0 || sensitivity > 3) {
+			log.error("Sensitivity is not a valid range from 0 to 3");
 			return false;
 		}
 		
 		//Send the command byte
+		log.info("Sending set accelerometer sensitivity command");
 		if (serialInterface.sendCommand(5)) {
 			
 			//If the command byte was received, send the sensitivity value
@@ -108,6 +116,7 @@ public class BaseCommands {
 			return serialInterface.sendInteger(sensitivity);
 		}
 		else {
+			log.error("Error setting accelerometer sensitivity");
 			return false;
 		}
 	}
@@ -121,12 +130,14 @@ public class BaseCommands {
 	public boolean setAccelerometerSleep() throws Exception {
 		
 		//Send the command byte
+		log.info("Sending accelerometer sleep command");
 		if (serialInterface.sendCommand(6)) {
 			
 			//If the command byte was received, return true
 			return true;
 		}
 		else {
+			log.error("Error setting accelerometer to sleep");
 			return false;
 		}
 	}
@@ -140,12 +151,14 @@ public class BaseCommands {
 	public boolean setAccelerometerWake() throws Exception {
 		
 		//Send the command byte
+		log.info("Sending accelerometer wake command");
 		if (serialInterface.sendCommand(7)) {
 			
 			//If the command byte was received, return true
 			return true;
 		}
 		else {
+			log.error("Error setting accelerometer to wake up");
 			return false;
 		}
 	}
@@ -159,12 +172,14 @@ public class BaseCommands {
 	public int getIRFront() throws Exception {
 		
 		//Send the command byte
+		log.info("Sending get front IR analog value command");
 		if (serialInterface.sendCommand(8)) {
 			
 			//If the command byte was received, return the value
 			return Integer.parseInt(serialInterface.receiveInteger().trim());
 		}
 		else {
+			log.error("Error getting the front IR analog value");
 			return -1;
 		}
 	}
@@ -178,12 +193,14 @@ public class BaseCommands {
 	public int getIRLeft() throws Exception {
 		
 		//Send the command byte
+		log.info("Sending get left IR analog value command");
 		if (serialInterface.sendCommand(9)) {
 			
 			//If the command byte was received, return the value
 			return Integer.parseInt(serialInterface.receiveInteger().trim());
 		}
 		else {
+			log.error("Error getting the left IR analog value");
 			return -1;
 		}
 	}
@@ -197,12 +214,14 @@ public class BaseCommands {
 	public int getIRRight() throws Exception {
 		
 		//Send the command byte
+		log.info("Sending get right IR analog value command");
 		if (serialInterface.sendCommand(10)) {
 			
 			//If the command byte was received, return the value
 			return Integer.parseInt(serialInterface.receiveInteger().trim());
 		}
 		else {
+			log.error("Error getting the right IR analog value");
 			return -1;
 		}
 	}
@@ -216,12 +235,14 @@ public class BaseCommands {
 	public int getIRBack() throws Exception {
 		
 		//Send the command byte
+		log.info("Sending get back IR analog value command");
 		if (serialInterface.sendCommand((byte) 11)) {
 			
 			//If the command byte was received, return the value
 			return Integer.parseInt(serialInterface.receiveInteger().trim());
 		}
 		else {
+			log.error("Error getting the back IR analog value");
 			return -1;
 		}
 	}
@@ -235,6 +256,7 @@ public class BaseCommands {
 	public int getIRBottom() throws Exception {
 		
 		//Send the command byte
+		log.info("Sending get bottom IR analog value command");
 		if (serialInterface.sendCommand(12)) {
 			
 			//If the command byte was received, send the power level
@@ -242,6 +264,7 @@ public class BaseCommands {
 			return Integer.parseInt(serialInterface.receiveInteger().trim());
 		}
 		else {
+			log.error("Error getting the bottom IR analog value");
 			return -1;
 		}
 	}
@@ -257,15 +280,18 @@ public class BaseCommands {
 		
 		//If the supplied power is not within the accepted range, return false
 		if  (power < 0 || power > 255) {
+			log.error("The power value for the drive forward command is not in valid range");
 			return false;
 		}
 		
 		//If the command byte was received, send the power level
 		//If the power level was received, return true
+		log.info("Sending drive forward command");
 		if (serialInterface.sendCommand(13)) {
 			return serialInterface.sendInteger(power);
 		}
 		else {
+			log.error("Error sending the drive forward command");
 			return false;
 		}
 	}
@@ -281,15 +307,18 @@ public class BaseCommands {
 		
 		//If the supplied power is not within the accepted range, return false
 		if  (power < 0 || power > 255) {
+			log.error("The power value for the drive reverse command is not in valid range");
 			return false;
 		}
 		
 		//If the command byte was received, send the power level
 		//If the power level was received, return true
+		log.info("Sending drive reverse command");
 		if (serialInterface.sendCommand(14)) {
 			return serialInterface.sendInteger(power);
 		}
 		else {
+			log.error("Error sending the drive reverse command");
 			return false;
 		}
 	}
@@ -305,15 +334,18 @@ public class BaseCommands {
 		
 		//If the supplied power is not within the accepted range, return false
 		if  (power < 0 || power > 255) {
+			log.error("The power value for the turn left command is not in valid range");
 			return false;
 		}
 		
 		//If the command byte was received, send the power level
 		//If the power level was received, return true
+		log.info("Sending turn left command");
 		if (serialInterface.sendCommand(15)) {
 			return serialInterface.sendInteger(power);
 		}
 		else {
+			log.error("Error sending the turn left command");
 			return false;
 		}
 	}
@@ -329,10 +361,12 @@ public class BaseCommands {
 		
 		//If the supplied power is not within the accepted range, return false
 		if  (power < 0 || power > 255) {
+			log.error("The power value for the turn right command is not in valid range");
 			return false;
 		}
 		
 		//Send the command byte
+		log.info("Sending turn right command");
 		if (serialInterface.sendCommand(16)) {
 			
 			//If the command byte was received, send the power level
@@ -340,6 +374,7 @@ public class BaseCommands {
 			return serialInterface.sendInteger(power);
 		}
 		else {
+			log.error("Error sending the turn right command");
 			return false;
 		}
 	}
@@ -354,10 +389,12 @@ public class BaseCommands {
 		
 		//If the command byte was received, send the power level
 		//If the power level was received, return true
+		log.info("Sending drive stop command");
 		if (serialInterface.sendCommand(17)) {
 			return true;
 		}
 		else {
+			log.error("Error sending the motor stop command");
 			return false;
 		}
 	}
@@ -372,10 +409,12 @@ public class BaseCommands {
 		
 		//If the command byte was received, send the power level
 		//If the power level was received, return true
+		log.info("Sending steering center command");
 		if (serialInterface.sendCommand(18)) {
 			return true;
 		}
 		else {
+			log.error("Error sending the steering center command");
 			return false;
 		}
 	}
@@ -388,10 +427,12 @@ public class BaseCommands {
 	 */
 	public boolean menuUp() throws Exception {
 		
+		log.info("Sending menu up command");
 		if (serialInterface.sendCommand(21)) {
 			return true;
 		}
 		else {
+			log.error("Error sending menu up command");
 			return false;
 		}
 	}
@@ -404,10 +445,12 @@ public class BaseCommands {
 	 */
 	public boolean menuDown() throws Exception {
 		
+		log.info("Sending menu down command");
 		if (serialInterface.sendCommand(22)) {
 			return true;
 		}
 		else {
+			log.error("Error sending menu down command");
 			return false;
 		}
 	}
@@ -420,10 +463,12 @@ public class BaseCommands {
 	 */
 	public boolean menuLeft() throws Exception {
 		
+		log.info("Sending menu left command");
 		if (serialInterface.sendCommand(23)) {
 			return true;
 		}
 		else {
+			log.error("Error sending menu left command");
 			return false;
 		}
 	}
@@ -436,10 +481,12 @@ public class BaseCommands {
 	 */
 	public boolean menuRight() throws Exception {
 		
+		log.info("Sending menu right command");
 		if (serialInterface.sendCommand(24)) {
 			return true;
 		}
 		else {
+			log.error("Error sending menu right command");
 			return false;
 		}
 	}
@@ -452,10 +499,12 @@ public class BaseCommands {
 	 */
 	public boolean menuSelect() throws Exception {
 		
+		log.info("Sending menu select command");
 		if (serialInterface.sendCommand(25)) {
 			return true;
 		}
 		else {
+			log.error("Error sending menu select command");
 			return false;
 		}
 	}
@@ -468,29 +517,12 @@ public class BaseCommands {
 	 */
 	public boolean menuBack() throws Exception {
 		
+		log.info("Sending menu back command");
 		if (serialInterface.sendCommand(26)) {
 			return true;
 		}
 		else {
-			return false;
-		}
-	}
-	
-	/**
-	 * Sleep robot.
-	 *
-	 * @return true, if successful
-	 * @throws Exception the exception
-	 */
-	public boolean sleepRobot() throws Exception {
-		
-		//Send the command byte
-		if (serialInterface.sendCommand(255)) {
-			
-			return true;
-			
-		}
-		else {
+			log.error("Error sending menu back command");
 			return false;
 		}
 	}
@@ -504,6 +536,7 @@ public class BaseCommands {
 	public int getHallCount() throws Exception {
 
 		//Send the command byte
+		log.info("Sending get hall effect sensor count command");
 		if (serialInterface.sendCommand(19)) {
 
 			//If the command byte was received, return the value

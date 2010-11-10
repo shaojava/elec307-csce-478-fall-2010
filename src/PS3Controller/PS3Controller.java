@@ -17,6 +17,7 @@ import net.java.games.input.EventQueue;
  */
 public class PS3Controller {
 	
+	/** The log4j looger object */
 	private Logger log;
 
 	/** The PS3 controller. */
@@ -66,6 +67,8 @@ public class PS3Controller {
 		//Get the list of the connected controllers
 		Controller [] controllerList = ControllerEnvironment.getDefaultEnvironment().getControllers();
 
+		boolean controllerFound = false;
+		
 		//For all the connected controllers
 		for(int i =0;i<controllerList.length;i++){
 
@@ -73,13 +76,24 @@ public class PS3Controller {
 			if(controllerList[i].getName().equals("PLAYSTATION(R)3 Controller")) {
 				log.info("Found PS3 controller on channel " + i);
 				PS3Controller = controllerList[i];
+				controllerFound = true;
 			}
 
 		}
+		
+		//If the playstation controller wasn't found in the list of connected devices.
+		if ( controllerFound == false ) {
+			log.error("No PS3 Controller found.");
+			System.out.println("No PS3 Controller Found.");
+		}
 
 		//Save the list of components for the PS3 Controller
-		PS3Components = PS3Controller.getComponents();
-
+		try {
+			PS3Components = PS3Controller.getComponents();
+		}
+		catch(Exception e) {
+			System.out.print(e);
+		}
 	}
 
 	/**
@@ -249,4 +263,28 @@ public class PS3Controller {
 			}
 		}
 	}
+
+	/**
+	 * Manual control.  This method allows the application to transfer control of the
+	 * mobile device to the user.  This is a good function to use when the algorithm 
+	 * fails so that we can manually drive the robot home.
+	 *
+	 * @param commands the commands
+	 * @param txSleepTime the tx sleep time
+	 * @throws Exception the exception
+	 */
+	public void manualControl(CompositeCommands commands, int txSleepTime) throws Exception {
+
+		//Do this until we decide to break from the loop
+		while(true) {
+			
+			//Send the commands to the robot based on controller input
+			sendRobotCommands(commands);
+			
+			//Wait
+			Thread.sleep(txSleepTime);	
+		}
+	}
+	
+	
 }
