@@ -1,6 +1,7 @@
 package HostDevice;
 
 import org.apache.log4j.Logger;
+import org.jfree.ui.RefineryUtilities;
 
 import PS3Controller.PS3Controller;
 import RobotCommands.BaseCommands;
@@ -24,6 +25,10 @@ public class MobileRobot {
 
 		log = Logger.getLogger(PS3Controller.class);
 		log.info("Host Device Program Started");
+		
+        final RobotPlotter posPlot = new RobotPlotter("Dead Rekoning Plot");
+        posPlot.pack();
+        RefineryUtilities.centerFrameOnScreen(posPlot);
 
 		//Establish IO port with machine communications port using the machine name for the port
 		log.info("Starting the serial interface input and output stream.");
@@ -44,6 +49,8 @@ public class MobileRobot {
 				//Instantiate new PS3 controller object
 				log.info("Instantiating a PS3 Controller object");
 				PS3Controller controller = new PS3Controller();
+				
+				controller.attachPlot(posPlot);
 
 				//Wait
 				Thread.sleep(1000);

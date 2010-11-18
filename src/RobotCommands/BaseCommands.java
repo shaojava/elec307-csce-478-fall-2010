@@ -420,6 +420,39 @@ public class BaseCommands {
 	}
 	
 	/**
+	 * Gets the hall count.
+	 *
+	 * @return the hall count
+	 * @throws Exception the exception
+	 */
+	public int getHallCount() throws Exception {
+
+		//Send the command byte
+		log.info("Sending get hall effect sensor count command");
+		if (serialInterface.sendCommand(19)) {
+
+			//If the command byte was received, return the value
+			return Integer.parseInt(serialInterface.receiveInteger().trim());
+		}
+		else {
+			return -1;
+		}
+	}
+	
+	public boolean resetHallCount() throws Exception {
+
+		//Send the command byte
+		log.info("Sending reset hall effect sensor count command");
+		if (serialInterface.sendCommand(20)) {
+
+			return true;
+		}
+		else {
+			return false;
+		}
+	}
+	
+	/**
 	 * Menu up.
 	 *
 	 * @return true, if successful
@@ -528,22 +561,91 @@ public class BaseCommands {
 	}
 	
 	/**
-	 * Gets the hall count.
+	 * Gets the compass heading.
 	 *
-	 * @return the hall count
+	 * @return the compass heading
 	 * @throws Exception the exception
 	 */
-	public int getHallCount() throws Exception {
-
+	public double compassGetHeading() throws Exception {
+		
 		//Send the command byte
-		log.info("Sending get hall effect sensor count command");
-		if (serialInterface.sendCommand(19)) {
+		log.info("Sending get compass heading command");
+		if (serialInterface.sendCommand(27)) {
+			
+			//Get the heading without decimal places (degrees * 10)
+			int integerHeading = Integer.parseInt(serialInterface.receiveInteger().trim());
+		
+			//Calculate the double heading
+			double doubleHeading = integerHeading / 10;
 
-			//If the command byte was received, return the value
-			return Integer.parseInt(serialInterface.receiveInteger().trim());
+			return doubleHeading;
+			
 		}
 		else {
+			log.error("Error getting the compass heading value");
 			return -1;
+		}
+	}
+	
+	/**
+	 * Compass sleep.
+	 *
+	 * @return true, if successful
+	 * @throws Exception the exception
+	 */
+	public boolean compassSleep() throws Exception {
+		
+		log.info("Sending compass sleep command");
+		if (serialInterface.sendCommand(28)) {
+			return true;
+		}
+		else {
+			log.error("Error sending compass sleep command");
+			return false;
+		}
+	}
+	
+	/**
+	 * Compass wake.
+	 *
+	 * @return true, if successful
+	 * @throws Exception the exception
+	 */
+	public boolean compassWake() throws Exception {
+		
+		log.info("Sending compass wake command");
+		if (serialInterface.sendCommand(29)) {
+			return true;
+		}
+		else {
+			log.error("Error sending compass wake command");
+			return false;
+		}
+	}
+	
+	/**
+	 * Compass set summed measurements.
+	 *
+	 * @param count the count
+	 * @return true, if successful
+	 * @throws Exception the exception
+	 */
+	public boolean compassSetSummedMeasurements(int count) throws Exception {
+		
+		//If the supplied power is not within the accepted range, return false
+		if  (count < 0 || count > 16) {
+			log.error("The number of summed measurements for the set compass summed measurements command is not in valid range");
+			return false;
+		}
+		
+		//If the command byte was received, send the number of summed measurements
+		log.info("Sending compass set summed measurements command");
+		if (serialInterface.sendCommand(30)) {
+			return serialInterface.sendInteger(count);
+		}
+		else {
+			log.error("Error sending the compass set summed measurements command");
+			return false;
 		}
 	}
 	

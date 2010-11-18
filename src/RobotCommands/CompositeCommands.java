@@ -146,6 +146,7 @@ public class CompositeCommands extends BaseCommands {
 	public double getDistanceTraveled() throws Exception {
 
 		double hallCount = super.getHallCount();
+		super.resetHallCount();
 		double hallDistance = ((Math.PI * 2) * hallCount) / 6;
 
 		return hallDistance;
@@ -196,6 +197,63 @@ public class CompositeCommands extends BaseCommands {
 			currentPower--;
 			Thread.sleep(Math.round(incrementInterval));
 		}
+		
+	}
+	
+	/**
+	 * Turn degrees.
+	 *
+	 * @param degrees the degrees
+	 * @param power the power
+	 * @throws Exception the exception
+	 */
+	public void turnLeftDegrees(double degrees, int motorPower) throws Exception{
+		
+		//Get the current=initial compass heading
+		double initialCompassHeading = super.compassGetHeading();
+		double currentCompassHeading = initialCompassHeading;
+		double finalCompassHeading = 0;
+		
+		if (initialCompassHeading < 270) {
+			finalCompassHeading = initialCompassHeading + 90;
+		}
+		else if (initialCompassHeading >= 270){
+			double temp = 360 - initialCompassHeading;
+			finalCompassHeading = 90 - temp;
+		}
+		
+		//Wait a bit
+		Thread.sleep(10);
+		
+		//If positive power, drive forward
+		super.motorTurnRight(255);
+		
+		//If positive power, drive forward
+		if (motorPower > 0) {
+			super.motorDriveForward(Math.abs(motorPower));
+		}
+		
+		//Else if negative power, drive reverse
+		else if (motorPower < 0) {
+			super.motorDriveReverse(Math.abs(motorPower));
+		}
+		
+		//While the difference in compass headings is less than the required degree change
+		while (currentCompassHeading <= finalCompassHeading) {
+			
+			System.out.println(Math.abs(initialCompassHeading - currentCompassHeading));
+			
+			//Wait a period of time
+			Thread.sleep(20);
+			
+			currentCompassHeading = super.compassGetHeading();
+		}
+		
+		//Stop the motor
+		super.motorStop();
+		
+		//Center the steering
+		super.motorCenter();
 		
 	}
 

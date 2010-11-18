@@ -14,5 +14,7 @@
 	<classpathentry kind="lib" path="lib/OSX/libjinput-osx.jnilib"/>
 	<classpathentry kind="lib" path="lib/jinput-test.jar"/>
 	<classpathentry kind="lib" path="lib/jinput.jar"/>
+	<classpathentry kind="lib" path="lib/jcommon-1.0.16.jar"/>
+	<classpathentry kind="lib" path="lib/jfreechart-1.0.13.jar"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>

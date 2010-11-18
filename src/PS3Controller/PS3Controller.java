@@ -3,6 +3,7 @@ package PS3Controller;
 import org.apache.log4j.Logger;
 
 import HostDevice.CommInterface;
+import HostDevice.RobotPlotter;
 import RobotCommands.CompositeCommands;
 import net.java.games.input.Component;
 import net.java.games.input.Controller;
@@ -55,6 +56,10 @@ public class PS3Controller {
 
 	/** The previous steer power. */
 	private int previousSteerPower = 0;
+	
+	private boolean plotAttached = false;
+	
+	private RobotPlotter plot;
 
 	/**
 	 * Instantiates a new PS3 controller.
@@ -262,6 +267,7 @@ public class PS3Controller {
 				commands.menuBack();
 			}
 		}
+		
 	}
 
 	/**
@@ -275,15 +281,53 @@ public class PS3Controller {
 	 */
 	public void manualControl(CompositeCommands commands, int txSleepTime) throws Exception {
 
+		long lastTimeMillis = System.currentTimeMillis();
+		
 		//Do this until we decide to break from the loop
-		while(true) {
-			
+		while(true) {			
 			//Send the commands to the robot based on controller input
 			sendRobotCommands(commands);
 			
 			//Wait
 			Thread.sleep(txSleepTime);	
+			
+			//If we have a plot attached
+			if(this.plotAttached) {
+				
+				//If the plot time interval has elapsed
+				if(System.currentTimeMillis() >= lastTimeMillis+plot.PLOT_DISTANCE_INTERVAL) {
+					
+					//Get the distance traveled
+					double distanceTraveled = commands.getDistanceTraveled();
+					
+					
+					
+					//If that distance is greater than zero, plot a new point
+					if (distanceTraveled > 0) {
+						double compassHeading = commands.compassGetHeading();
+						System.out.println(compassHeading+ ", " + distanceTraveled);
+						this.plot.updatePosistion(compassHeading,distanceTraveled);
+					}
+					
+					//Update this last time a point was plotted
+					lastTimeMillis = System.currentTimeMillis();
+				}
+			}
 		}
+	}
+
+	public void attachPlot(RobotPlotter posPlot) {
+		
+		//If there is not plot attached
+		if(this.plotAttached == false) {
+			
+			//Attach the plot
+			this.plot = posPlot;
+			plotAttached = true;
+			
+			//Make the plot visible
+			this.plot.setVisible(true);
+		}	
 	}
 	
 	
